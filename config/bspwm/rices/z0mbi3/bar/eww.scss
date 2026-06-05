@@ -3,19 +3,19 @@
 }
 
 // Variable Color's
-$background: #0d0f18;
-$foreground: #a5b6cf;
+$background: #f8f9f9;
+$foreground: #3e3e3e;
 
-$black: #151720;
-$gray: #1c1e27;
-$red: #dd6777;
-$green: #90ceaa;
-$yellow: #ecd3a0;
-$blue: #86aaec;
-$magenta: #c296eb;
-$cyan: #93cee9;
+$black: #878393;
+$gray: #878393;
+$red: #37467d;
+$green: #487e4d;
+$yellow: #7b8957;
+$blue: #878393;
+$magenta: #d68d7e;
+$cyan: #e99257;
 $white: $foreground;
-$archlogo: #0f94d2;
+$archlogo: #878393;
 
 // The bar
 .eww_bar {
@@ -42,19 +42,19 @@ $archlogo: #0f94d2;
 
 .workspace-focused {
   font-size: 18px;
-  color: #8ea6c4;
+  color: #3e3e3e;
   margin: 0.35rem 0 0.35rem 0;
 }
 
 .workspace-occupied {
   font-size: 18px;
-  color: #6e8db4;
+  color: #878393;
   margin: 0.35rem 0 0.35rem 0;
 }
 
 .workspace-empty {
   font-size: 18px;
-  color: #434c5e;
+  color: #f8f9f9;
   margin: 0.35rem 0 0.35rem 0;
 }
 
@@ -107,7 +107,7 @@ $archlogo: #0f94d2;
   font-family: "JetBrainsMono NF";
   font-size: 14px;
   font-weight: Bold;
-  color: #8ea6c4;
+  color: #3e3e3e;
   margin: 0.4rem 0 0.2rem 0.2rem;
 }
 

@@ -9,8 +9,8 @@ follow = mouse
 
 width = (300, 400)
 #height = (0, 200)
-origin = top-right
-offset = (20, 60)
+origin = top-center
+offset = (0, 10)
 scale = 0
 
 notification_limit = 20
@@ -27,8 +27,8 @@ padding = 15
 horizontal_padding = 15
 text_icon_padding = 0
 
-frame_width = 0
-frame_color = "#222330"
+frame_width = 2
+frame_color = "#c3a5e6"
 
 sort = no
 idle_threshold = 0
@@ -37,7 +37,7 @@ font = JetBrainsMono NF Medium 9
 line_height = 0
 
 markup = full
-format = "<span size='xx-large' font_desc='Cantarell 9' weight='bold' foreground='#73A3C5'>%s</span>\n%b"
+format = "<span size='xx-large' font_desc='Cantarell 9' weight='bold' foreground='#db959a'>%s</span>\n%b"
 alignment = center
 vertical_alignment = center
 
@@ -50,7 +50,7 @@ hide_duplicate_count = true
 show_indicators = yes
 
 enable_recursive_icon_lookup = true
-icon_theme = "TokyoNight-SE, Adwaita"
+icon_theme = "Catppuccin-Mocha, Adwaita"
 icon_position = left
 min_icon_size = 60
 max_icon_size = 90
@@ -72,7 +72,7 @@ mouse_right_click = close_all
 
 progress_bar = true
 progress_bar_height = 10
-progress_bar_frame_width = 0
+progress_bar_frame_width = 2
 progress_bar_min_width = 125
 progress_bar_max_width = 250
 progress_bar_corner_radius = 5
@@ -82,15 +82,15 @@ class = Dunst
 
 [urgency_low]
 timeout = 3
-background = "#f3f3f4"
-foreground = "#52738C"
+background = "#f9f9fa"
+foreground = "#696e73"
 
 [urgency_normal]
 timeout = 5
-background = "#f3f3f4"
-foreground = "#3c3c3d"
+background = "#f9f9fa"
+foreground = "#3e3e3e"
 
 [urgency_critical]
 timeout = 0
-background = "#f3f3f4"
-foreground = "#9B8E75"
+background = "#f9f9fa"
+foreground = "#65696e"
