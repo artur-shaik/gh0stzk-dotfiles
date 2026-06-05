@@ -21,8 +21,8 @@ case "$class" in
         # не тайлила и не ресайзила окна (ресайз вешает TUI Claude Code)
         geo=$(bspc query -T -m focused | jq -r '.rectangle | "\(.x) \(.y) \(.width) \(.height)"')
         set -- $geo
-        W=800; H=520
-        X=$(( $1 + $3 - W - 20 )); Y=$(( $2 + $4 - H - 20 ))
+        W=720; H=470
+        X=$(( $1 + $3 - W - 20 )); Y=$(( $2 + 40 ))
         result "state=floating focus=on rectangle=${W}x${H}+${X}+${Y}"
         ;;
     FloaTerm)
