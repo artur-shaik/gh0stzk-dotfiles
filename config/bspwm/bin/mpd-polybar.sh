@@ -9,8 +9,8 @@ cur=$(mpc -h "$HOST" -p "$PORT" current -f '[[%artist% - ]%title%]' 2>/dev/null 
 
 state=$(mpc -h "$HOST" -p "$PORT" status 2>/dev/null | sed -n '2s/^\[\([a-z]*\)\].*/\1/p')
 if [ "$state" = "playing" ]; then
-    icon=""
+    icon="󰐊"
 else
-    icon=""
+    icon="󰏤"
 fi
 printf '%s %s\n' "$icon" "$cur"
