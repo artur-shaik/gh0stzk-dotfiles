@@ -12,7 +12,7 @@
 
 ;; Pacman
 (defpoll UPDATES :interval "15m" `cat $HOME/.cache/Updates.txt 2>/dev/null`)
-(defpoll packages :interval "1h" "pacman -Q | wc -l")
+(defpoll packages :interval "1h" "rpm -qa | wc -l")
 
 ;; Weather
 (defpoll weathericon :interval "15m" "Weather icon")
@@ -122,7 +122,7 @@
 					:hexpand true
 					(label :halign "start"
 						   :class "pacman-icon"
-						   :text "󰮯")
+						   :text "󰏖")
 					(box :space-evenly "false"
 						 (eventbox :cursor "pointer"
 						 (button :class "pacman-updates"
@@ -135,7 +135,7 @@
 					:spacing 8
 					(label :class "arch-icon"
 						   :halign "start"
-						   :text "󰣇")
+						   :text "")
 					(box
 						 :space-evenly "false"
 						 (box :orientation "v"
@@ -144,10 +144,10 @@
 							  :style "margin-left: 10px;"
 							  (label :class "os-icon"
 									 :halign "start"
-									 :text "󰣇")
+									 :text "")
 							  (label :class "pkgs-icon"
 									 :halign "start"
-									 :text "󰮯")
+									 :text "󰏖")
 							  (label :class "wm-icon"
 									 :halign "start"
 									 :text "󱪳")))

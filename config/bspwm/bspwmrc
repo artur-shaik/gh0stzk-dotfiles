@@ -15,6 +15,9 @@
 # Set environment variables
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 export XDG_CURRENT_DESKTOP='bspwm'
+# ash: удалённый mpd для mpc/MediaControl/eww-плеера
+[ -r "$HOME/.mpd_host" ] && export MPD_HOST="$(cat "$HOME/.mpd_host")"
+[ -r "$HOME/.mpd_port" ] && export MPD_PORT="$(cat "$HOME/.mpd_port")"
 ## Fix java applications
 export _JAVA_AWT_WM_NONREPARENTING=1
 
