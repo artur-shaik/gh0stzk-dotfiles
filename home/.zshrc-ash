@@ -106,6 +106,7 @@ bindkey '^[[6~' history-beginning-search-forward
 bindkey '^[[7~' beginning-of-line 
 bindkey '^[[8~' end-of-line
 
+bindkey -M viins '^r' history-incremental-search-backward  # был omz-дефолт
 bindkey -M viins '^s' history-incremental-search-backward
 bindkey -M vicmd '^s' history-incremental-search-backward
 
