@@ -2,7 +2,7 @@
 
 cat >"$HOME"/.config/bspwm/eww/colors.scss <<-EOF
 \$bg: ${bg};
-\$bg-alt: ${accent_color};
+\$bg-alt: ${blackb};
 \$fg: ${fg};
 \$black: ${blackb};
 \$red: ${red};
