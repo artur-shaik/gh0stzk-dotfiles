@@ -60,8 +60,11 @@ run() {
 # Set system vars for polybar
 "$HOME"/.config/bspwm/bin/SetSysVars
 
-# Launch sxhkd daemon
-run sxhkd -c "${HOME}"/.config/bspwm/config/sxhkdrc
+# Launch sxhkd daemon (ash: наши хоткеи, не gh0stzk)
+run sxhkd -c "${HOME}"/.config/sxhkd/sxhkdrc
+
+# ash: раскладка us,ru как в старом профиле
+setxkbmap -layout 'us,ru' -option 'grp:alt_space_toggle,grp_led:caps,ctrl:nocaps'
 
 # Load current theme
 "${HOME}"/.config/bspwm/bin/Theme.sh
@@ -75,11 +78,8 @@ run xsettingsd --config="${HOME}"/.config/bspwm/config/xsettingsd >/dev/null 2>&
 # Launch eww daemon
 pidof -q eww || { eww -c "${HOME}"/.config/bspwm/eww daemon & }
 
-# Launch clipboard daemon
-run clipcatd
+# ash: clipcat/lxpolkit нет в репах Tumbleweed, не используются
+# run clipcatd
+# run lxpolkit
 
-# Launch polkit
-run lxpolkit
-
-# Start one time message
-[ ! -f "$HOME/.config/bspwm/config/.first_run_done" ] && alacritty --hold -e sh -c 'cat "$HOME/.config/bspwm/config/FirstMessage.txt"; sleep 0.1' && touch "$HOME/.config/bspwm/config/.first_run_done"
+# ash: FirstMessage убран
