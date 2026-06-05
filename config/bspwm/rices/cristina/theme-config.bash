@@ -51,8 +51,8 @@ P_ANIMATIONS="@"		# (@ = enable) (# = disable)
 P_TERM_OPACITY="1.0"	# Terminal transparency. Range: 0.1 - 1.0 (1.0 = disabled)
 
 # Dunst
-dunst_offset='(0, 10)'
-dunst_origin='top-center'
+dunst_offset='(20, 40)'
+dunst_origin='top-right'
 dunst_transparency='0'
 dunst_corner_radius='6'
 dunst_font='JetBrainsMono NF Medium 9'
@@ -61,9 +61,9 @@ dunst_frame_color="$magenta"
 dunst_icon_theme="Catppuccin-Mocha"
 # Dunst animations
 dunst_close_preset="fly-out"
-dunst_close_direction="up"
+dunst_close_direction="right"
 dunst_open_preset="fly-in"
-dunst_open_direction="up"
+dunst_open_direction="right"
 
 # Jgmenu colors
 jg_bg="$bg"
