@@ -1,0 +1,7 @@
+#!/bin/sh
+# ash: обёртка над mpc — хост/порт читаются из ~/.mpd_host|port на КАЖДЫЙ вызов,
+# горячая смена хоста работает без перезапуска eww/polybar/bspwm.
+# bspwm/bin стоит первым в PATH (bspwmrc) → её получают все дети сессии.
+H=$(cat "$HOME/.mpd_host" 2>/dev/null)
+P=$(cat "$HOME/.mpd_port" 2>/dev/null)
+exec /usr/bin/mpc ${H:+-h "$H"} ${P:+-p "$P"} "$@"
