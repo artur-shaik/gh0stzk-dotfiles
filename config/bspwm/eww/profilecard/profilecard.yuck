@@ -12,7 +12,7 @@
 
 ;; Pacman
 (defpoll UPDATES :interval "15m" `cat $HOME/.cache/Updates.txt 2>/dev/null`)
-(defpoll packages :interval "1h" "rpm -qa | wc -l")
+(defpoll packages :interval "24h" "uname -r")
 
 ;; Weather
 (defpoll weathericon :interval "15m" "Weather icon")
@@ -147,7 +147,7 @@
 									 :text "")
 							  (label :class "pkgs-icon"
 									 :halign "start"
-									 :text "󰏖")
+									 :text "")
 							  (label :class "wm-icon"
 									 :halign "start"
 									 :text "󱪳")))
