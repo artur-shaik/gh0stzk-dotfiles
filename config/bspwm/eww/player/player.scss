@@ -43,24 +43,24 @@
         font-family: Cartograph CF;
         font-size: 1.1rem;
         font-weight: bold;
-        color: $fg;
-        text-shadow: 0 0 0.5rem rgba($color: $bg-alt, $alpha: 0.5);
+        color: #f4f4f4; /* ash: fixed color over album art */
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.85);
       }
 
       .player-artist {
         font-family: JetBrainsMono NF;
         font-weight: bolder;
         font-size: 0.8rem;
-        color: $fg;
-        text-shadow: 0 0 0.5rem rgba($color: $bg-alt, $alpha: 0.5);
+        color: #f4f4f4; /* ash: fixed color over album art */
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.85);
       }
 
       .player-time {
         font-style: italic;
         font-family: Cartograph CF;
         font-size: 0.8rem;
-        color: $fg;
-        text-shadow: 0 0 0.5rem rgba($color: $bg-alt, $alpha: 0.5);
+        color: #f4f4f4; /* ash: fixed color over album art */
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.85);
       }
 
       .player-bar scale trough highlight {

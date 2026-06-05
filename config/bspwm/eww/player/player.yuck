@@ -42,7 +42,7 @@
 		:space-evenly false
 		(box
 			:class "player-art"
-			:style "background-image: url('${music-art}')"
+			:style "background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('${music-art}')"
 			(box
 				:class "player-info"
 				:space-evenly false
