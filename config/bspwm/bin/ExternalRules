@@ -28,6 +28,9 @@ case "$class" in
     UpdatesList)
         result "state=floating focus=on center=on rectangle=1948x827+0+0"
         ;;
+    PulseMixer)
+        result "state=floating focus=on center=on rectangle=900x500+0+0"
+        ;;
     Btop)
         result "state=floating focus=on center=on rectangle=1300x800+0+0"
         ;;
