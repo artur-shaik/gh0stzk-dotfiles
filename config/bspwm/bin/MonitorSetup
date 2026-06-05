@@ -43,7 +43,7 @@ case $NUM_MONITORS in
         rate_1="$2"
 
         xrandr --output "$monitor_1" --primary --mode "$mode_1" --pos 0x0 --auto --rate "$rate_1"
-        bspc monitor "$monitor_1" -d 1 2 3 4 5 6
+        bspc monitor "$monitor_1" -d 0 1 2 3 4 5 6 7 8 9  # ash: 10 десктопов
         ;;
 
     2)
@@ -61,8 +61,8 @@ case $NUM_MONITORS in
         xrandr --output "$monitor_1" --primary --mode "$mode_1" --pos 0x0 --auto --rate "$rate_1" \
                --output "$monitor_2" --mode "$mode_2" --right-of "$monitor_1" --auto --rate "$rate_2"
 
-        bspc monitor "$monitor_1" -d 1 2 3 4
-        bspc monitor "$monitor_2" -d 5 6 7 8
+        bspc monitor "$monitor_1" -d 0 1 2 3 4  # ash
+        bspc monitor "$monitor_2" -d 5 6 7 8 9  # ash
         bspc wm -O "$monitor_1" "$monitor_2"
         ;;
 
@@ -87,9 +87,9 @@ case $NUM_MONITORS in
                --output "$monitor_2" --mode "$mode_2" --left-of "$monitor_1" --auto --rate "$rate_2" \
                --output "$monitor_3" --mode "$mode_3" --right-of "$monitor_1" --auto --rate "$rate_3"
 
-        bspc monitor "$monitor_1" -d 1 2 3
-        bspc monitor "$monitor_2" -d 4 5 6
-        bspc monitor "$monitor_3" -d 7 8 9
+        bspc monitor "$monitor_1" -d 0 1 2 3 6  # ash: как configure_monitors
+        bspc monitor "$monitor_2" -d 4 7  # ash
+        bspc monitor "$monitor_3" -d 5 8 9  # ash
         bspc wm -O "$monitor_1" "$monitor_2" "$monitor_3"
         ;;
 
@@ -120,9 +120,9 @@ case $NUM_MONITORS in
                --output "$monitor_3" --mode "$mode_3" --right-of "$monitor_1" --auto --rate "$rate_3" \
                --output "$monitor_4" --mode "$mode_4" --above "$monitor_1" --auto --rate "$rate_4"
 
-        bspc monitor "$monitor_1" -d 1 2 3
-        bspc monitor "$monitor_2" -d 4 5
-        bspc monitor "$monitor_3" -d 6 7
+        bspc monitor "$monitor_1" -d 0 1 2  # ash: 10 десктопов
+        bspc monitor "$monitor_2" -d 3 4
+        bspc monitor "$monitor_3" -d 5 6 7
         bspc monitor "$monitor_4" -d 8 9
         bspc wm -O "$monitor_1" "$monitor_2" "$monitor_3" "$monitor_4"
         ;;
