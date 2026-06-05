@@ -4,6 +4,10 @@
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 
 cur=$(mpc current -f '[[%artist% - ]%title%]' 2>/dev/null | cut -c1-70)
+# трек без тегов: показать имя файла (без пути и расширения)
+if [ -z "$cur" ]; then
+    cur=$(mpc current -f '%file%' 2>/dev/null | sed 's|.*/||; s|\.[a-zA-Z0-9]*$||' | cut -c1-70)
+fi
 [ -z "$cur" ] && exit 0
 
 state=$(mpc status 2>/dev/null | sed -n '2s/^\[\([a-z]*\)\].*/\1/p')
