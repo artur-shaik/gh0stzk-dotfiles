@@ -181,7 +181,7 @@
   background-color: $bg-alt;
 }
 .wifi-btn {
-  color: $blue;
+  color: $fg;
 }
 
 .wifi-no-btn {
@@ -189,7 +189,7 @@
 }
 
 .bluetooth-btn {
-  color: $blue;
+  color: $fg;
 }
 
 .bluetooth-no-btn {
@@ -197,7 +197,7 @@
 }
 
 .airplane-btn {
-  color: $blue;
+  color: $fg;
 }
 
 .airplane-no-btn {
@@ -205,7 +205,7 @@
 }
 
 .redshift-btn {
-  color: $blue;
+  color: $fg;
 }
 
 .redshift-no-btn {
@@ -239,7 +239,7 @@
     background-color: $black;
 
     &.ram {
-      color: $blue;
+      color: $fg;
     }
 
     &.cpu {

@@ -1,7 +1,31 @@
 #!/bin/sh
-# ash: обёртка над mpc — хост/порт читаются из ~/.mpd_host|port на КАЖДЫЙ вызов,
-# горячая смена хоста работает без перезапуска eww/polybar/bspwm.
-# bspwm/bin стоит первым в PATH (bspwmrc) → её получают все дети сессии.
+# ash: обёртка над mpc — подключение к АКТИВНОМУ mpd.
+# Хост из ~/.mpd_host|port (читается на каждый вызов — горячая смена);
+# если удалённый недоступен — фоллбек на localhost (его поднимает .xinitrc).
+# Проверка доступности кэшируется на 5с (/tmp/.mpc-active-host), чтобы
+# секундные поллы eww/polybar не платили таймаут на лежащем хосте.
+CACHE=/tmp/.mpc-active-host
 H=$(cat "$HOME/.mpd_host" 2>/dev/null)
 P=$(cat "$HOME/.mpd_port" 2>/dev/null)
-exec /usr/bin/mpc ${H:+-h "$H"} ${P:+-p "$P"} "$@"
+P=${P:-6600}
+
+active_host() {
+    if [ -f "$CACHE" ]; then
+        now=$(date +%s)
+        read -r ts cached < "$CACHE" 2>/dev/null
+        if [ $(( now - ${ts:-0} )) -lt 5 ]; then
+            echo "$cached"
+            return
+        fi
+    fi
+    host=localhost
+    if [ -n "$H" ] && timeout 0.5 sh -c "exec 3<>/dev/tcp/$H/$P" 2>/dev/null; then
+        host="$H"
+    fi
+    echo "$(date +%s) $host" > "$CACHE"
+    echo "$host"
+}
+
+# /dev/tcp — башизм; на системах без него в sh проверка тихо падает в localhost.
+# На openSUSE /bin/sh = bash, /dev/tcp работает.
+exec /usr/bin/mpc -h "$(active_host)" -p "$P" "$@"
