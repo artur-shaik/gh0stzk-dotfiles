@@ -21,6 +21,20 @@ UPDATE_FILE="${XDG_CACHE_HOME:-$HOME/.cache}/Updates.txt"
 
 # Main verification function
 check_updates() {
+    # ash: openSUSE/zypper вместо pacman
+    if command -v zypper >/dev/null; then
+        updates=$(zypper -q list-updates 2>/dev/null | grep '^v ')
+        official=$(printf '%s' "$updates" | grep -c '^v ')
+        aur=0
+        aur_updates=""
+        total=$official
+        echo "$total" > "$UPDATE_FILE"
+        if pgrep -x polybar >/dev/null; then
+            polybar-msg action updates hook 0 >/dev/null 2>&1
+        fi
+        return
+    fi
+
     # Get official updates
     official=0
     if updates=$(checkupdates 2>/dev/null); then

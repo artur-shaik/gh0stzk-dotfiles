@@ -72,3 +72,6 @@ sleep 1
 if ! pgrep -x picom >/dev/null; then
     picom --config "$HOME/.config/bspwm/config/picom.conf" -b
 fi
+
+# ash: обновить счётчик zypper-обновлений (на Arch это делает pacman-hook)
+(Updates --sync-polybar >/dev/null 2>&1 &)
