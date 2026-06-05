@@ -25,6 +25,9 @@ case "$class" in
         X=$(( $1 + $3 - W - 20 )); Y=$(( $2 + 40 ))
         result "state=floating focus=on rectangle=${W}x${H}+${X}+${Y}"
         ;;
+    LazyDocker)
+        result "state=floating focus=on center=on rectangle=1200x700+0+0"
+        ;;
     FloaTerm)
 	result "state=floating center=on rectangle=696x399+0+0"
         ;;
