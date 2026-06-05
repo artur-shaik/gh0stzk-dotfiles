@@ -1,55 +1,77 @@
 #!/usr/bin/env python3
-# ash: перекраска конфигов райса в wal-палитру.
-# Каждый #RRGGBB (и #AARRGGBB — альфа сохраняется) заменяется ближайшим
-# цветом wal (16 цветов + bg/fg, метрика — RGB-дистанция).
-# Работает от pristine-копии <file>.orig (создаётся при первом прогоне),
-# чтобы повторные прогоны не дрейфовали.
+# ash: перекраска конфигов райса в wal-палитру, СЕМАНТИЧЕСКАЯ.
+# Каждый hex в файле мапится на ближайший цвет ИСХОДНОЙ палитры райса
+# (theme-config.bash), а роль переводится в wal-аналог:
+#   bg->background, fg->foreground, black->color0 ... whiteb->color15.
+# Так светлая wal-тема корректно инвертирует тёмный бар (bg остаётся bg),
+# чего не давал прежний наивный nearest-по-RGB (тёмное липло к тёмному).
+# Pristine-копии <file>.orig — от них работают повторные прогоны.
 import re
 import sys
 from pathlib import Path
 
 WAL = Path.home() / ".cache/wal/colors.sh"
 
+# роль в theme-config.bash -> переменная wal
+ROLE_MAP = {
+    "bg": "background", "fg": "foreground",
+    "black": "color0", "red": "color1", "green": "color2", "yellow": "color3",
+    "blue": "color4", "magenta": "color5", "cyan": "color6", "white": "color7",
+    "blackb": "color8", "redb": "color9", "greenb": "color10", "yellowb": "color11",
+    "blueb": "color12", "magentab": "color13", "cyanb": "color14", "whiteb": "color15",
+    "accent_color": "color4",
+}
 
-def load_wal():
-    palette = []
-    for line in WAL.read_text().splitlines():
-        m = re.match(r"^(?:export )?(\w+)='(#[0-9a-fA-F]{6})'", line)
+HEX_RE = re.compile(r"^(?:export )?(\w+)=['\"]?(#[0-9a-fA-F]{6})['\"]?")
+
+
+def load_vars(path):
+    out = {}
+    for line in Path(path).read_text().splitlines():
+        m = HEX_RE.match(line.strip())
         if m:
-            palette.append(m.group(2))
-    return list(dict.fromkeys(palette))  # uniq, порядок сохранён
+            out[m.group(1)] = m.group(2)
+    return out
 
 
 def rgb(h):
     return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
 
 
-def nearest(h, palette):
-    r, g, b = rgb(h)
-    return min(palette, key=lambda p: sum((a - c) ** 2 for a, c in zip(rgb(p), (r, g, b))))
-
-
-def recolor(text, palette):
-    def repl(m):
-        alpha, color = m.group(1) or "", m.group(2)
-        return "#" + alpha + nearest("#" + color, palette)[1:]
-    return re.sub(r"#([0-9a-fA-F]{2})?([0-9a-fA-F]{6})\b", repl, text)
+def dist(a, b):
+    return sum((x - y) ** 2 for x, y in zip(rgb(a), rgb(b)))
 
 
 def main():
+    if len(sys.argv) < 3:
+        sys.exit("usage: wal-recolor <theme-config.bash> <file>...")
     if not WAL.exists():
-        sys.exit(0)  # wal не прогонялся — оставляем как есть
-    palette = load_wal()
-    if not palette:
         sys.exit(0)
-    for arg in sys.argv[1:]:
+    rice = load_vars(sys.argv[1])
+    wal = load_vars(WAL)
+    # анкеры: hex райса -> hex wal (через роль)
+    anchors = {}
+    for role, wal_var in ROLE_MAP.items():
+        if role in rice and wal_var in wal:
+            anchors.setdefault(rice[role].upper(), wal[wal_var])
+    if not anchors:
+        sys.exit(0)
+    anchor_keys = list(anchors)
+
+    def remap(m):
+        alpha, color = m.group(1) or "", "#" + m.group(2)
+        best = min(anchor_keys, key=lambda a: dist(a, color))
+        return "#" + alpha + anchors[best][1:]
+
+    for arg in sys.argv[2:]:
         f = Path(arg)
         if not f.exists():
             continue
         orig = f.with_suffix(f.suffix + ".orig")
         if not orig.exists():
             orig.write_text(f.read_text())
-        f.write_text(recolor(orig.read_text(), palette))
+        text = re.sub(r"#([0-9a-fA-F]{2})?([0-9a-fA-F]{6})\b", remap, orig.read_text())
+        f.write_text(text)
 
 
 if __name__ == "__main__":

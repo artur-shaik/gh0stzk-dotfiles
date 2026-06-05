@@ -50,6 +50,7 @@ if [ -r "$HOME/.cache/wal/colors.sh" ]; then
     # Перекраска захардкоженных hex'ов бара райса (polybar ini / eww scss)
     # ближайшими wal-цветами. Pristine-копии — *.orig (см. wal-recolor).
     "$HOME"/.config/bspwm/bin/wal-recolor \
+        "$HOME/.config/bspwm/rices/$RICE/theme-config.bash" \
         "$HOME/.config/bspwm/rices/$RICE/config.ini" \
         "$HOME/.config/bspwm/rices/$RICE/modules.ini" \
         "$HOME/.config/bspwm/rices/$RICE/bar/eww.scss" 2>/dev/null || true
