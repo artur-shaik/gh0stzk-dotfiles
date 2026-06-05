@@ -56,6 +56,8 @@ source ~/.oh-my-zsh/custom/plugins/fzf-tab/fzf-tab.plugin.zsh 2>/dev/null
 
 # ============================================================
 # ---------- моё управление и среда (из dotfiles/.zshrc) ----------
+# массив должен существовать до присвоений стилей (плагин сорсится в конце)
+typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 ZSH_HIGHLIGHT_STYLES[builtin]=none,bold
 ZSH_HIGHLIGHT_STYLES[alias]=none,bold
