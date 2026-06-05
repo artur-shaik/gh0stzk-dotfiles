@@ -15,5 +15,5 @@ out=$(eval "$@" 2>/dev/null)
 [ -z "$out" ] && exit 0
 if [ -n "$RE" ] && printf '%s' "$out" | grep -Eq "$RE"; then exit 0; fi
 
-printf '%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s%s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
+printf ' %%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s%s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
     "$C" "$BG" "$C" "$BG" "$ICON" "$out" "$BG" "$C"

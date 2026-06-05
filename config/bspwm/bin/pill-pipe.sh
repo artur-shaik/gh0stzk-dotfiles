@@ -10,7 +10,7 @@ while IFS= read -r line; do
     case "$line" in
         *[0-9]*)
             C=$(col "$1"); BG=$(col bg)
-            printf '%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s%s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
+            printf ' %%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s%s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
                 "$C" "$BG" "$C" "$BG" "$ICON" "$line" "$BG" "$C"
             ;;
         *) echo "" ;;
