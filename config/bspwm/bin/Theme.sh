@@ -64,3 +64,10 @@ MODULE_DIR="$HOME/.config/bspwm/config/modules"
 for module in "$MODULE_DIR"/*.sh; do
     . "$module"
 done
+
+# ash: self-heal picom — модуль 01 правит picom.conf sed'ом под живым
+# picom (v13 авторелоадит конфиг и может упасть на полузаписанном файле)
+sleep 1
+if ! pgrep -x picom >/dev/null; then
+    picom --config "$HOME/.config/bspwm/config/picom.conf" -b
+fi
