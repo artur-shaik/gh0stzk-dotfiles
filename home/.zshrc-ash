@@ -5,6 +5,11 @@
 
 [[ $- != *i* ]] && return
 
+# p10k instant prompt — рисует промпт до загрузки остального
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 # ---------- база gh0stzk: быстрый compinit с кэшем ----------
 autoload -Uz compinit
 local zcompdump="$HOME/.cache/zcompdump-ash"
@@ -19,15 +24,11 @@ fi
 _comp_options+=(globdots)
 
 autoload -Uz add-zsh-hook
-autoload -Uz vcs_info
-precmd_vcs() { vcs_info }
-add-zsh-hook precmd precmd_vcs
 
 zstyle ':completion:*' menu select
 zstyle ':completion:*:descriptions' format '[%d]'
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|[._-]=* r:|=*' '+l:|=*'
-zstyle ':vcs_info:*' formats ' %B%s-[%F{magenta}%f %F{yellow}%b%f]-'
 zstyle ':fzf-tab:*' fzf-bindings 'space:accept'
 zstyle ':fzf-tab:*' accept-line enter
 
@@ -40,8 +41,6 @@ setopt appendhistory sharehistory hist_ignore_space \
 
 setopt AUTOCD PROMPT_SUBST MENU_COMPLETE LIST_PACKED AUTO_LIST COMPLETE_IN_WORD
 
-# ---------- его минимал-prompt с vcs_info ----------
-PS1='%B%F{blue}%f%b %B%F{magenta}%n%f%b %B%F{red}%~%f%b${vcs_info_msg_0_} %(?.%B%F{green}.%F{red})%f%b '
 
 # ---------- заголовок терминала ----------
 function xterm_title_precmd () { print -Pn -- '\e]2;%n@%m %~\a' }
@@ -374,6 +373,10 @@ export PATH="$PATH:/home/ash/.lmstudio/bin"
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# p10k standalone (без omz)
+source ~/.oh-my-zsh/custom/themes/powerlevel10k/powerlevel10k.zsh-theme
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # syntax-highlighting — сорсить последним
 source ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 2>/dev/null
