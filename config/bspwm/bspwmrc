@@ -39,6 +39,10 @@ bspc subscribe monitor | while read -r line; do
     esac
 done &
 
+# ash: чёрный ящик окон (лог в ~/.cache/bspwm-window-log)
+pkill -f 'bspc subscribe node_add node_remove' 2>/dev/null
+"$HOME"/.config/bspwm/bin/window-blackbox &
+
 #  ╔╗ ╔═╗╔═╗╦ ╦╔╦╗  ╔═╗╔═╗╔╗╔╔═╗╦╔═╗
 #  ╠╩╗╚═╗╠═╝║║║║║║  ║  ║ ║║║║╠╣ ║║ ╦
 #  ╚═╝╚═╝╩  ╚╩╝╩ ╩  ╚═╝╚═╝╝╚╝╚  ╩╚═╝

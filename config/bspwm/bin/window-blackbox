@@ -1,0 +1,30 @@
+#!/bin/sh
+# ash: чёрный ящик окон — лог add/remove с классом и заголовком.
+# На node_removed окно уже мертво, класс не снять → кэшируем на node_added.
+LOG="$HOME/.cache/bspwm-window-log"
+CACHE_DIR="/tmp/.bspwm-blackbox"
+mkdir -p "$CACHE_DIR"
+
+# node_add: monitor desktop ip node (wid 5-е поле); node_remove: monitor desktop node (4-е)
+bspc subscribe node_add node_remove | while read -r event _ _ f4 f5; do
+    ts=$(date '+%F %T')
+    case "$event" in
+        node_add)
+            wid=$f5
+            cls=$(xprop -id "$wid" WM_CLASS 2>/dev/null | sed 's/.*= //')
+            title=$(xdotool getwindowname "$wid" 2>/dev/null | head -c 60)
+            printf '%s\n' "$cls | $title" > "$CACHE_DIR/$wid"
+            printf '%s ADD %s %s | %s\n' "$ts" "$wid" "$cls" "$title" >> "$LOG"
+            ;;
+        node_remove)
+            wid=$f4
+            info=$(cat "$CACHE_DIR/$wid" 2>/dev/null || echo "(не закэшировано)")
+            printf '%s REMOVE %s %s\n' "$ts" "$wid" "$info" >> "$LOG"
+            rm -f "$CACHE_DIR/$wid"
+            ;;
+    esac
+    # ротация: держим последние 2000 строк
+    if [ "$(wc -l < "$LOG" 2>/dev/null || echo 0)" -gt 3000 ]; then
+        tail -2000 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
+    fi
+done
