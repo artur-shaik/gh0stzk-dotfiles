@@ -44,6 +44,30 @@ for m in $(bspc query -M --names); do
     bspc monitor "$m" -r 2>/dev/null
 done
 
+# ash: распределение десктопов ПЕРЕНОСОМ — bspc monitor -d (reset) удаляет
+# лишние десктопы вместе с окнами и создаёт пустые на новом мониторе
+ensure_and_move() {
+    mon=$1; shift
+    for want in "$@"; do
+        found=
+        for id in $(bspc query -D); do
+            [ "$(bspc query -D -d "$id" --names)" = "$want" ] && { found=$id; break; }
+        done
+        if [ -n "$found" ]; then
+            bspc desktop "$found" -m "$mon" 2>/dev/null
+        else
+            bspc monitor "$mon" -a "$want"
+        fi
+    done
+    bspc monitor "$mon" -o "$@" 2>/dev/null
+    # дефолтный пустой "Desktop" нового монитора — удалить
+    for id in $(bspc query -D -m "$mon"); do
+        nm=$(bspc query -D -d "$id" --names)
+        case "$nm" in [0-9]) continue ;; esac
+        [ -z "$(bspc query -N -d "$id" -n .window)" ] && bspc desktop "$id" -r
+    done
+}
+
 # Function to obtain monitor info (POSIX-compliant)
 get_monitor_info() {
     echo "$XRANDR_OUTPUT" | awk -v monitor="$1" '
@@ -64,7 +88,7 @@ case $NUM_MONITORS in
         rate_1="$2"
 
         xrandr --output "$monitor_1" --primary --mode "$mode_1" --pos 0x0 --auto --rate "$rate_1"
-        bspc monitor "$monitor_1" -d 0 1 2 3 4 5 6 7 8 9  # ash: 10 десктопов
+        ensure_and_move "$monitor_1" 0 1 2 3 4 5 6 7 8 9  # ash
         ;;
 
     2)
@@ -82,8 +106,8 @@ case $NUM_MONITORS in
         xrandr --output "$monitor_1" --primary --mode "$mode_1" --pos 0x0 --auto --rate "$rate_1" \
                --output "$monitor_2" --mode "$mode_2" --right-of "$monitor_1" --auto --rate "$rate_2"
 
-        bspc monitor "$monitor_1" -d 0 1 2 3 4  # ash
-        bspc monitor "$monitor_2" -d 5 6 7 8 9  # ash
+        ensure_and_move "$monitor_1" 0 1 2 3 4  # ash
+        ensure_and_move "$monitor_2" 5 6 7 8 9  # ash
         bspc wm -O "$monitor_1" "$monitor_2"
         ;;
 
@@ -108,9 +132,9 @@ case $NUM_MONITORS in
                --output "$monitor_2" --mode "$mode_2" --left-of "$monitor_1" --auto --rate "$rate_2" \
                --output "$monitor_3" --mode "$mode_3" --right-of "$monitor_1" --auto --rate "$rate_3"
 
-        bspc monitor "$monitor_1" -d 0 1 2 3 6  # ash: как configure_monitors
-        bspc monitor "$monitor_2" -d 4 7  # ash
-        bspc monitor "$monitor_3" -d 5 8 9  # ash
+        ensure_and_move "$monitor_1" 0 1 2 3 6  # ash
+        ensure_and_move "$monitor_2" 4 7  # ash
+        ensure_and_move "$monitor_3" 5 8 9  # ash
         bspc wm -O "$monitor_1" "$monitor_2" "$monitor_3"
         ;;
 
@@ -141,10 +165,10 @@ case $NUM_MONITORS in
                --output "$monitor_3" --mode "$mode_3" --right-of "$monitor_1" --auto --rate "$rate_3" \
                --output "$monitor_4" --mode "$mode_4" --above "$monitor_1" --auto --rate "$rate_4"
 
-        bspc monitor "$monitor_1" -d 0 1 2  # ash: 10 десктопов
-        bspc monitor "$monitor_2" -d 3 4
-        bspc monitor "$monitor_3" -d 5 6 7
-        bspc monitor "$monitor_4" -d 8 9
+        ensure_and_move "$monitor_1" 0 1 2  # ash
+        ensure_and_move "$monitor_2" 3 4
+        ensure_and_move "$monitor_3" 5 6 7
+        ensure_and_move "$monitor_4" 8 9
         bspc wm -O "$monitor_1" "$monitor_2" "$monitor_3" "$monitor_4"
         ;;
 
