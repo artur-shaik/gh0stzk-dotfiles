@@ -27,6 +27,17 @@ export _JAVA_AWT_WM_NONREPARENTING=1
 
 MonitorSetup
 
+# ash: hotplug мониторов — пере-раскладка десктопов и спасение окон
+# (без этого отключённый монитор остаётся фантомом с окнами)
+pkill -f 'bspc subscribe monitor' 2>/dev/null
+bspc subscribe monitor | while read -r line; do
+    case $line in
+        monitor_add*|monitor_geometry*|monitor_remove*)
+            MonitorSetup
+            ;;
+    esac
+done &
+
 #  ╔╗ ╔═╗╔═╗╦ ╦╔╦╗  ╔═╗╔═╗╔╗╔╔═╗╦╔═╗
 #  ╠╩╗╚═╗╠═╝║║║║║║  ║  ║ ║║║║╠╣ ║║ ╦
 #  ╚═╝╚═╝╩  ╚╩╝╩ ╩  ╚═╝╚═╝╝╚╝╚  ╩╚═╝

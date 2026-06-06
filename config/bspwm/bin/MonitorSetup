@@ -23,6 +23,27 @@ xrandr | while read -r mon state _; do
     [ "$state" = "disconnected" ] && xrandr --output "$mon" --off
 done
 
+# ash: фантомные bspwm-мониторы (физически отключённые): окна — на живой
+# монитор в одноимённые десктопы, фантом — удалить
+connected=$(xrandr | awk '$2 == "connected" {print $1}')
+for m in $(bspc query -M --names); do
+    echo "$connected" | grep -qx "$m" && continue
+    alive=$(echo "$connected" | head -1)
+    for d in $(bspc query -D -m "$m" 2>/dev/null); do
+        dname=$(bspc query -D -d "$d" --names)
+        for w in $(bspc query -N -d "$d" -n .window 2>/dev/null); do
+            tline=$(bspc query -D -m "$alive" --names | grep -nx "$dname" | cut -d: -f1)
+        if [ -n "$tline" ]; then
+                target=$(bspc query -D -m "$alive" | sed -n "${tline}p")
+                bspc node "$w" -d "$target"
+            else
+                bspc node "$w" -m "$alive"
+            fi
+        done
+    done
+    bspc monitor "$m" -r 2>/dev/null
+done
+
 # Function to obtain monitor info (POSIX-compliant)
 get_monitor_info() {
     echo "$XRANDR_OUTPUT" | awk -v monitor="$1" '
