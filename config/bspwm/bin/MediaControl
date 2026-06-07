@@ -50,16 +50,34 @@ case $Control in
                 echo "$Control"
                 ;;
             --cover)
-                current_song=$(mpc current -f "%title%-%artist%")
-				last_song=""
-				[ -f "$LAST_SONG_FILE" ] && last_song=$(cat "$LAST_SONG_FILE")
-
-				if [ "$current_song" != "$last_song" ] || [ ! -f "$Cover" ]; then
-					ffmpeg -i "$mpddir/$(mpc current -f %file%)" "$Cover" -y > /dev/null 2>&1 || cp "$bkpCover" "$Cover"
-					echo "$current_song" > "$LAST_SONG_FILE"
-				fi
-
-				echo "$Cover"
+                # ash: асинхронная подгрузка обложки с кэшем по треку.
+                # Remote mpd: локального файла нет — тянем по протоколу
+                # (readpicture=embedded, albumart=cover.jpg рядом), в фоне;
+                # пока качается — fallback, следующий poll подхватит кэш.
+                file=$(mpc current -f %file%)
+                [ -z "$file" ] && { echo "$bkpCover"; exit 0; }
+                CDIR="$HOME/.cache/mpd-covers"; mkdir -p "$CDIR"
+                hash=$(printf '%s' "$file" | md5sum | cut -d' ' -f1)
+                cover="$CDIR/$hash.img"
+                if [ -s "$cover" ]; then echo "$cover"; exit 0; fi
+                if [ -f "$cover.fail" ]; then echo "$bkpCover"; exit 0; fi
+                if mkdir "$cover.lock" 2>/dev/null; then
+                    (
+                        if [ -f "$mpddir/$file" ] && ffmpeg -i "$mpddir/$file" "$cover.tmp.png" -y >/dev/null 2>&1; then
+                            mv "$cover.tmp.png" "$cover"
+                        elif mpc readpicture "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
+                            mv "$cover.tmp" "$cover"
+                        elif mpc albumart "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
+                            mv "$cover.tmp" "$cover"
+                        else
+                            touch "$cover.fail"
+                        fi
+                        rm -f "$cover.tmp" "$cover.tmp.png"
+                        rmdir "$cover.lock" 2>/dev/null
+                        find "$CDIR" -type f -mtime +60 -delete 2>/dev/null
+                    ) &
+                fi
+                echo "$bkpCover"
                 ;;
             nccover)
                 ffmpeg -i "$mpddir/$(mpc current -f %file%)" "$Cover" -y > /dev/null 2>&1 || cp "$bkpCover" "$Cover"
