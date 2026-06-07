@@ -1,34 +1,34 @@
-*background: #f4f5f5
-*foreground: #3d3d3d
+*background: #030201
+*foreground: #c0bfbf
 
 ! Black + DarkGrey
-*color0:  #f4f5f5
-*color8:  #b7b7b7
+*color0:  #030201
+*color8:  #424140
 
 ! DarkRed + Red
-*color1:  #445562
-*color9:  #445562
+*color1:  #614F26
+*color9:  #614F26
 
 ! DarkGreen + Green
-*color2:  #435c6d
-*color10: #435c6d
+*color2:  #3E3E42
+*color10: #3E3E42
 
 ! DarkYellow + Yellow
-*color3:  #536978
-*color11: #536978
+*color3:  #5C5B58
+*color11: #5C5B58
 
 ! DarkBlue + Blue
-*color4:  #607d8a
-*color12: #607d8a
+*color4:  #8B703B
+*color12: #8B703B
 
 ! DarkMagenta + Magenta
-*color5:  #8aabb8
-*color13: #8aabb8
+*color5:  #AA9465
+*color13: #AA9465
 
 ! DarkCyan + Cyan
-*color6:  #b3d4dc
-*color14: #b3d4dc
+*color6:  #8F7994
+*color14: #8F7994
 
 ! LightGrey + White
-*color7:  #3d3d3d
-*color15: #3d3d3d
+*color7:  #c0bfbf
+*color15: #c0bfbf

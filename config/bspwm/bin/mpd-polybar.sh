@@ -8,7 +8,9 @@ export PATH="$HOME/.config/bspwm/bin:$PATH"
 # оба тега -> "artist - title"; только title -> "title"; пусто -> fallback ниже
 # лимит длины — от ширины монитора этого бара (env MONITOR от Bar.bash):
 # на ноуте 1920px длинный mpd выжимает правый край бара за экран
-w=$(xrandr 2>/dev/null | sed -n "s/^${MONITOR:-x} connected[^0-9]*\([0-9]*\)x.*/\1/p" | head -1)
+# ширину берём из кэша MonitorSetup: xrandr в поллере = ежесекундный
+# EDID-опрос монитора, спам журнала и дестабилизация modeset
+w=$(cat "/tmp/.mon-width.${MONITOR:-eDP-1}" 2>/dev/null)
 limit=$(( (${w:-1920} - 1500) / 9 ))
 [ "$limit" -lt 25 ] && limit=25
 [ "$limit" -gt 70 ] && limit=70

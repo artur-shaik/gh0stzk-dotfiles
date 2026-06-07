@@ -85,6 +85,7 @@ apply_side_padding() {
     for m in $(echo "$XRANDR_OUTPUT" | awk '$2 == "connected" {print $1}'); do
         w=$(echo "$XRANDR_OUTPUT" | sed -n "s/^$m connected[^0-9]*\([0-9]*\)x.*/\1/p" | head -1)
         [ -n "$w" ] || continue
+        printf '%s' "$w" > "/tmp/.mon-width.$m"   # кэш для скриптов бара (НЕ дёргать xrandr в поллерах!)
         gap=$(bspc config window_gap 2>/dev/null || echo 0)
         # единая рамка: поля окон = 20px (= VGAP в layout-gaps.sh, = поля бара)
         pad=$(( 20 - gap ))
