@@ -123,6 +123,11 @@ case $Control in
                     txt=$(curl -sm 8 "https://lrclib.net/api/search?q=$(enc "$artist $title")" \
                         | jq -r '.[0].plainLyrics // empty' 2>/dev/null)
                 fi
+                # fallback: lyrics.ovh
+                if [ -z "$txt" ] && [ -n "$artist" ]; then
+                    txt=$(curl -sm 8 "https://api.lyrics.ovh/v1/$(enc "$artist")/$(enc "$title")" \
+                        | jq -r '.lyrics // empty' 2>/dev/null)
+                fi
                 if [ -n "$txt" ]; then
                     printf '%s — %s\n\n%s\n' "$artist" "$title" "$txt" > "$lyr"
                     echo "$lyr"
