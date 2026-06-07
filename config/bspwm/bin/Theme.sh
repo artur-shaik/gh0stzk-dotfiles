@@ -45,6 +45,15 @@ if [ -r "$HOME/.cache/wal/colors.sh" ]; then
     blueb="$color12"   magentab="$color13" cyanb="$color14"  whiteb="$color15"
     accent_color="$color4"
     arch_icon="$color4"
+    # rofi_* в theme-config — формулы от $bg/$fg, но вычислены ДО override:
+    # пересчитать от wal-палитры (семантика как у райсов)
+    rofi_background="$bg"
+    rofi_bg_alt="$accent_color"
+    rofi_background_alt="${bg}E0"
+    rofi_fg="$fg"
+    rofi_selected="$magenta"
+    rofi_active="$green"
+    rofi_urgent="$red"
     NORMAL_BC="$color0"
     FOCUSED_BC="$color4"
 
