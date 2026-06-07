@@ -64,11 +64,18 @@ case $Control in
                 if [ -f "$cover.fail" ]; then echo "$bkpCover"; exit 0; fi
                 if mkdir "$cover.lock" 2>/dev/null; then
                     (
+                        # readpicture заставляет mpd читать ИГРАЮЩИЙ файл — на
+                        # гигантских сетах (часы) сервер давится и звук икает;
+                        # для стримов и треков >30мин протокольный фетч пропускаем
+                        skip_proto=0
+                        case "$file" in http://*|https://*) skip_proto=1 ;; esac
+                        secs=$(mpc status %totaltime% 2>/dev/null | awk -F: 'NF==2{print $1*60+$2} NF==3{print $1*3600+$2*60+$3}')
+                        [ "${secs:-0}" -gt 1800 ] && skip_proto=1
                         if [ -f "$mpddir/$file" ] && ffmpeg -i "$mpddir/$file" "$cover.tmp.png" -y >/dev/null 2>&1; then
                             mv "$cover.tmp.png" "$cover"
-                        elif mpc readpicture "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
+                        elif [ "$skip_proto" = 0 ] && mpc readpicture "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
                             mv "$cover.tmp" "$cover"
-                        elif mpc albumart "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
+                        elif [ "$skip_proto" = 0 ] && mpc albumart "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
                             mv "$cover.tmp" "$cover"
                         else
                             # интернет-фоллбек: iTunes Search (без ключа)
