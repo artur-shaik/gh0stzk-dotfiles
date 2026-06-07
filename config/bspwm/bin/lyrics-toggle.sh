@@ -18,6 +18,9 @@ fi
 
 if [ "$($EWW get lyrics-open 2>/dev/null)" = "true" ]; then
     $EWW update lyrics-open=false
+    # GTK-окно eww не ужимается после revealer'а — пересоздать на месте
+    $EWW close music
+    $EWW open music --screen "$(pointer-screen)"
     exit 0
 fi
 f=$(MediaControl --lyrics)
