@@ -81,15 +81,14 @@
 					:class "player-title"
 					:halign "start"
 					:text music-title
-					:limit-width 32
-					:wrap false
+					:wrap true
 					:xalign 0
 				)
 				(label
 					:class "player-artist"
 					:halign "start"
 					:text music-artist
-					:limit-width 35
+					:wrap true
 				)
 
 				(box
