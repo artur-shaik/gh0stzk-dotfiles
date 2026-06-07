@@ -6,10 +6,17 @@ export PATH="$HOME/.config/bspwm/bin:$PATH"
 # mpc-скобки прячутся, только если ВСЕ теги внутри пусты:
 # [[%artist% - ]%title%] -> внутренняя скобка изолирует артиста:
 # оба тега -> "artist - title"; только title -> "title"; пусто -> fallback ниже
-cur=$(mpc current -f '[[%artist% - ]%title%]' 2>/dev/null | cut -c1-70)
+# лимит длины — от ширины монитора этого бара (env MONITOR от Bar.bash):
+# на ноуте 1920px длинный mpd выжимает правый край бара за экран
+w=$(xrandr 2>/dev/null | sed -n "s/^${MONITOR:-x} connected[^0-9]*\([0-9]*\)x.*/\1/p" | head -1)
+limit=$(( (${w:-1920} - 1500) / 9 ))
+[ "$limit" -lt 25 ] && limit=25
+[ "$limit" -gt 70 ] && limit=70
+
+cur=$(mpc current -f '[[%artist% - ]%title%]' 2>/dev/null | cut -c1-$limit)
 # трек без тегов: показать имя файла (без пути и расширения)
 if [ -z "$cur" ]; then
-    cur=$(mpc current -f '%file%' 2>/dev/null | sed 's|.*/||; s|\.[a-zA-Z0-9]*$||' | cut -c1-70)
+    cur=$(mpc current -f '%file%' 2>/dev/null | sed 's|.*/||; s|\.[a-zA-Z0-9]*$||' | cut -c1-$limit)
 fi
 [ -z "$cur" ] && exit 0
 
