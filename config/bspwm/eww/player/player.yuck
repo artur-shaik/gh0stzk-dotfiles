@@ -1,4 +1,7 @@
 ;; Vars ;;
+(defvar lyrics-open false)
+(defvar lyrics-text "")
+
 (deflisten music
   :initial '{"title":"","artist":"","status":"Stopped","art":"","position":"0:00","length":"0:00","positions":0,"lengths":0,"shuffle":"Off","loop":"Off","player":"MPD"}'
   "music-state-listen.sh")
@@ -154,7 +157,7 @@
 				:cursor "pointer"
 				(button
 					:class "min"
-					:onclick "lyrics-popup.sh &"
+					:onclick "lyrics-toggle.sh &"
 					"󰦰"
 				)
 			)
@@ -178,5 +181,25 @@
     :anchor "bottom center"
   )
 	:wm-ignore false
-  (player)
+  (box
+    :orientation "v"
+    :space-evenly false
+    (player)
+    (revealer
+      :reveal lyrics-open
+      :transition "slidedown"
+      :duration "300ms"
+      (scroll
+        :vscroll true
+        :hscroll false
+        :height 320
+        (label
+          :class "lyrics-box"
+          :text lyrics-text
+          :wrap true
+          :xalign 0
+        )
+      )
+    )
+  )
 )
