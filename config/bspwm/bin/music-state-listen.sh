@@ -4,7 +4,7 @@
 # JSON раз в секунду; тяжёлые поля (current/art) — раз в 3 тика.
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 
-title=""; artist=""; art=""
+title=""; artist=""; art=""; prev_title=""
 tick=0
 while :; do
     st=$(mpc status 2>/dev/null)
@@ -33,6 +33,12 @@ while :; do
         artist=${cur#*	}
         [ "$artist" = "$cur" ] && artist=""
         art=$(MediaControl --cover 2>/dev/null)
+    fi
+
+    # автообновление лирики при смене трека (если секция открыта)
+    if [ "$title" != "$prev_title" ]; then
+        prev_title="$title"
+        (lyrics-toggle.sh --refresh >/dev/null 2>&1 &)
     fi
     tick=$((tick + 1))
 
