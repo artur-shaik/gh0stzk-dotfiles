@@ -75,7 +75,14 @@ while :; do
         pill green "󰏤 $(mmss $left)"
     else
         [ "$mode" = "quiet" ] && icon="󰂛" || icon="󰅶"
-        pill purple "$icon $(mmss "$(val GetTimerRemaining s restbreak)")"
+        left=$(val GetTimerRemaining s restbreak)
+        over=$(val GetTimerOverdue s restbreak)
+        if [ "${left:-0}" -le 0 ] && [ "${over:-0}" -gt 0 ]; then
+            # перерыв просрочен (отложен): Remaining замирает на 0, растёт Overdue
+            pill red "$icon +$(mmss "$over")"
+        else
+            pill purple "$icon $(mmss "$left")"
+        fi
     fi
     sleep 1
 done
