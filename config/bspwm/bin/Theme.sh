@@ -44,6 +44,7 @@ if [ -r "$HOME/.cache/wal/colors.sh" ]; then
     blackb="$color8"   redb="$color9"      greenb="$color10" yellowb="$color11"
     blueb="$color12"   magentab="$color13" cyanb="$color14"  whiteb="$color15"
     accent_color="$color4"
+    arch_icon="$color4"
     NORMAL_BC="$color0"
     FOCUSED_BC="$color4"
 
