@@ -81,8 +81,8 @@
 					:class "player-title"
 					:halign "start"
 					:text music-title
-					:limit-width 30
-					:wrap true
+					:limit-width 32
+					:wrap false
 					:xalign 0
 				)
 				(label
