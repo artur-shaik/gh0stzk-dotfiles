@@ -46,19 +46,22 @@ RICE=$(cat "$HOME/.config/bspwm/.rice" 2>/dev/null)
 CFG="$HOME/.config/bspwm/rices/$RICE/config.ini"
 col() { awk -v k="$1" '$1==k && $2=="=" {print $3; exit}' "$CFG"; }
 
-pill() { # <color-name> <text>
-    C=$(col "$1"); BG=$(col bg)
+pill() { # <color-name | #hex> <text>
+    case "$1" in "#"*) C=$1;; *) C=$(col "$1");; esac
+    BG=$(col bg)
     printf ' %%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
         "$C" "$BG" "$C" "$BG" "$2" "$BG" "$C"
 }
 
 mmss() { s=$1; [ "$s" -lt 0 ] && s=0; printf '%d:%02d' $((s / 60)) $((s % 60)); }
 
-# длительности перерывов из конфига workrave (меняются редко — читаем раз)
+# длительности перерывов/лимит работы из конфига workrave (меняются редко — читаем раз)
 REST_LEN=$(busctl --user call "$WR_DEST" "$WR_CORE" org.workrave.ConfigInterface \
     GetInt s "timers/rest_break/auto_reset" 2>/dev/null | awk '{print $2}')
 MICRO_LEN=$(busctl --user call "$WR_DEST" "$WR_CORE" org.workrave.ConfigInterface \
     GetInt s "timers/micro_pause/auto_reset" 2>/dev/null | awk '{print $2}')
+REST_LIMIT=$(busctl --user call "$WR_DEST" "$WR_CORE" org.workrave.ConfigInterface \
+    GetInt s "timers/rest_break/limit" 2>/dev/null | awk '{print $2}')
 
 while :; do
     mode=$(val GetOperationMode)
@@ -76,10 +79,13 @@ while :; do
     else
         [ "$mode" = "quiet" ] && icon="󰂛" || icon="󰅶"
         left=$(val GetTimerRemaining s restbreak)
-        over=$(val GetTimerOverdue s restbreak)
-        if [ "${left:-0}" -le 0 ] && [ "${over:-0}" -gt 0 ]; then
-            # перерыв просрочен (отложен): Remaining замирает на 0, растёт Overdue
-            pill red "$icon +$(mmss "$over")"
+        # текущая просрочка = Elapsed - limit (GetTimerOverdue НЕ годится:
+        # это НАКОПЛЕННАЯ просрочка за день, Remaining же замирает на 0)
+        over=$(( $(val GetTimerElapsed s restbreak) - ${REST_LIMIT:-0} ))
+        if [ "${left:-0}" -le 0 ] && [ "$over" -gt 0 ]; then
+            # фикс-красный: wal-палитра бывает без красного (роль red — болото),
+            # а просрочка должна ОРАТЬ независимо от обоев
+            pill "#d54e53" "$icon +$(mmss "$over")"
         else
             pill purple "$icon $(mmss "$left")"
         fi
