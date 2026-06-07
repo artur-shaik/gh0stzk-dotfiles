@@ -1,15 +1,7 @@
 ;; Vars ;;
-(defpoll music-player     :interval "1s" "MediaControl --player")
-(defpoll music-art        :interval "3s" "MediaControl --cover")
-(defpoll music-title      :interval "1s" "MediaControl --title")
-(defpoll music-artist     :interval "1s" "MediaControl --artist")
-(defpoll music-status     :interval "1s" "MediaControl --status")
-(defpoll music-position   :interval "1s" "MediaControl --position")
-(defpoll music-positions  :interval "1s" "MediaControl --positions")
-(defpoll music-length     :interval "1s" "MediaControl --length")
-(defpoll music-lengths    :interval "1s" "MediaControl --lengths")
-(defpoll shuffle          :interval "1s" "MediaControl --shuffle")
-(defpoll loop             :interval "1s" "MediaControl --loop")
+(deflisten music
+  :initial '{"title":"","artist":"","status":"Stopped","art":"","position":"0:00","length":"0:00","positions":0,"lengths":0,"shuffle":"Off","loop":"Off","player":"MPD"}'
+  "music-state-listen.sh")
 
 ;; Widgets ;;
 (defwidget shuffle [color action status]
@@ -42,7 +34,7 @@
 		:space-evenly false
 		(box
 			:class "player-art"
-			:style "background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('${music-art}')"
+			:style "background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('${music.art}')"
 			(box
 				:class "player-info"
 				:space-evenly false
@@ -54,40 +46,40 @@
 						:space-evenly false
 						:spacing 10
 						(shuffle
-							:action {music-player == "MPD" ? "mpc random" : "playerctl -p ${music-player} shuffle toggle"}
-							:color {shuffle == "On" ? "#81ae5f" : "#b8bfe5"}
-							:status shuffle
+							:action {music.player == "MPD" ? "mpc random" : "playerctl -p ${music.player} shuffle toggle"}
+							:color {music.shuffle == "On" ? "#81ae5f" : "#b8bfe5"}
+							:status {music.shuffle}
 						)
 						(loop
-							:action {loop == "None" ? "playerctl -p ${music-player} loop playlist" :
-							loop == "Off" ? "mpc repeat on" :
-							loop == "On" ? "mpc repeat off" :
-							loop == "Playlist" ? "playerctl -p ${music-player} loop track" : "playerctl -p ${music-player} loop none"}
-							:icon  {loop == "Track" ? "󰑘" :
-							loop == "Playlist" || loop == "On" ? "󰑖" : "󰑗"}
-							:color {loop == "Playlist" || loop == "Track" || loop == "On" ? "#81ae5f" : "#b8bfe5"}
-							:status loop
+							:action {music.loop == "None" ? "playerctl -p ${music.player} loop playlist" :
+							music.loop == "Off" ? "mpc repeat on" :
+							music.loop == "On" ? "mpc repeat off" :
+							music.loop == "Playlist" ? "playerctl -p ${music.player} loop track" : "playerctl -p ${music.player} loop none"}
+							:icon  {music.music.loop == "Track" ? "󰑘" :
+							music.loop == "Playlist" || music.loop == "On" ? "󰑖" : "󰑗"}
+							:color {music.music.loop == "Playlist" || music.loop == "Track" || music.loop == "On" ? "#81ae5f" : "#b8bfe5"}
+							:status {music.loop}
 						)
 					)
 					(box
 						(button
-							:class {music-player != "spotify" ? "mpd-icon" : "spotify-icon"}
+							:class {music.player != "spotify" ? "mpd-icon" : "spotify-icon"}
 							:halign "end"
-							{music-player != "spotify" ? "󰎆" : "󰓇"}
+							{music.player != "spotify" ? "󰎆" : "󰓇"}
 						)
 					)
 				)
 				(label
 					:class "player-title"
 					:halign "start"
-					:text music-title
+					:text {music.title}
 					:wrap true
 					:xalign 0
 				)
 				(label
 					:class "player-artist"
 					:halign "start"
-					:text music-artist
+					:text {music.artist}
 					:wrap true
 				)
 
@@ -102,10 +94,10 @@
 						(eventbox
 							:cursor "pointer"
 							(scale
-								:onchange {music-player == "MPD" ? "mpc seek {}" : "playerctl -p ${music-player} position {}"}
+								:onchange {music.player == "MPD" ? "mpc seek {}" : "playerctl -p ${music.player} position {}"}
 								:min 0
-								:max {music-lengths ?: "100"}
-								:value {music-positions ?: "0"}
+								:max {music.lengths == 0 ? 100 : music.lengths}
+								:value {music.positions}
 							)
 						)
 					)
@@ -116,12 +108,12 @@
 						:spacing 3
 						(label
 							:class "player-time"
-							:text {music-position ?: "0:00"}
+							:text {music.position}
 						)
 						(label :class "player-time" :text "/")
 						(label
 							:class "player-time"
-							:text {music-length ?: "0:00"}
+							:text {music.length}
 						)
 					)
 				)
@@ -147,7 +139,7 @@
 				(button
 					:class "player-toggle"
 					:onclick "MediaControl --toggle"
-					{music-status == "Playing" ? "󰏤" : music-status == "Paused" ? "󰐊" : "󰓛"}
+					{music.status == "Playing" ? "󰏤" : music.status == "Paused" ? "󰐊" : "󰓛"}
 				)
 			)
 			(eventbox
