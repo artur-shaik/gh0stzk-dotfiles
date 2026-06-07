@@ -79,6 +79,27 @@ get_monitor_info() {
 set -- $(echo "$XRANDR_OUTPUT" | awk '$2 == "connected" {print $1}')
 NUM_MONITORS=$#
 
+# ash: боковые отступы окон = полям бара (бар width 95%, offset-x 2.5%) —
+# края тайлов совпадают с краями бара; fullscreen паддинги игнорирует
+apply_side_padding() {
+    for m in $(echo "$XRANDR_OUTPUT" | awk '$2 == "connected" {print $1}'); do
+        w=$(echo "$XRANDR_OUTPUT" | sed -n "s/^$m connected[^0-9]*\([0-9]*\)x.*/\1/p" | head -1)
+        [ -n "$w" ] || continue
+        gap=$(bspc config window_gap 2>/dev/null || echo 0)
+        # единая рамка: поля окон = 20px (= VGAP в layout-gaps.sh, = поля бара)
+        pad=$(( 20 - gap ))
+        [ "$pad" -lt 0 ] && pad=0
+        # ВАЖНО: monitor- и desktop-паддинги СУММИРУЮТСЯ — ставим только
+        # desktop-уровень (хоткеи юзера тоже desktop), monitor в ноль
+        bspc config -m "$m" left_padding 0 2>/dev/null
+        bspc config -m "$m" right_padding 0 2>/dev/null
+        for d in $(bspc query -D -m "$m" 2>/dev/null); do
+            bspc config -d "$d" left_padding "$pad" 2>/dev/null
+            bspc config -d "$d" right_padding "$pad" 2>/dev/null
+        done
+    done
+}
+
 # Main case for monitor configuration
 case $NUM_MONITORS in
     1)
@@ -176,3 +197,5 @@ case $NUM_MONITORS in
         echo "Warning: Configuration not supported for more than 4 monitors"
         ;;
 esac
+
+apply_side_padding

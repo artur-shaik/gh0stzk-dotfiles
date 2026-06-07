@@ -39,6 +39,10 @@ bspc subscribe monitor | while read -r line; do
     esac
 done &
 
+# ash: вертикальные гапы по layout (tiled: 20px, monocle: впритык)
+pkill -f 'layout-gaps.sh' 2>/dev/null
+"$HOME"/.config/bspwm/bin/layout-gaps.sh &
+
 # ash: чёрный ящик окон (лог в ~/.cache/bspwm-window-log)
 pkill -f 'bspc subscribe node_add node_remove' 2>/dev/null
 "$HOME"/.config/bspwm/bin/window-blackbox &
@@ -51,7 +55,7 @@ bspc config external_rules_command "${HOME}"/.config/bspwm/bin/ExternalRules
 
 bspc config window_gap                5
 bspc config split_ratio               0.51
-bspc config single_monocle            true
+bspc config single_monocle            false  # ash: иначе одиночное окно всегда monocle и layout-gaps не работают
 
 bspc config automatic_scheme          longest_side
 bspc config initial_polarity          second_child
