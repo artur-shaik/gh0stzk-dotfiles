@@ -12,8 +12,10 @@ ICON=$2; RE=$3
 shift 3
 
 out=$(eval "$@" 2>/dev/null)
-[ -z "$out" ] && exit 0
-if [ -n "$RE" ] && printf '%s' "$out" | grep -Eq "$RE"; then exit 0; fi
+# скрытие: ЯВНАЯ пустая строка — на тихий exit без вывода polybar
+# не обновляет label и пилюля «зависает» с прошлым содержимым
+[ -z "$out" ] && { echo ""; exit 0; }
+if [ -n "$RE" ] && printf '%s' "$out" | grep -Eq "$RE"; then echo ""; exit 0; fi
 
 printf ' %%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s%s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
     "$C" "$BG" "$C" "$BG" "$ICON" "$out" "$BG" "$C"
