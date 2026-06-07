@@ -162,6 +162,14 @@
 				:cursor "pointer"
 				(button
 					:class "min"
+					:onclick "lyrics-popup.sh &"
+					"󰦰"
+				)
+			)
+      (eventbox
+				:cursor "pointer"
+				(button
+					:class "min"
 					:onclick "eww -c ~/.config/bspwm/eww open --toggle music"
 					"󰅙"
 				)

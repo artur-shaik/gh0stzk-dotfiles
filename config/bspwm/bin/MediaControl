@@ -57,7 +57,8 @@ case $Control in
                 file=$(mpc current -f %file%)
                 [ -z "$file" ] && { echo "$bkpCover"; exit 0; }
                 CDIR="$HOME/.cache/mpd-covers"; mkdir -p "$CDIR"
-                hash=$(printf '%s' "$file" | md5sum | cut -d' ' -f1)
+                # ключ кэша: file+title (у радио %file% один — URL потока)
+                hash=$(printf '%s|%s' "$file" "$(mpc current -f %title%)" | md5sum | cut -d' ' -f1)
                 cover="$CDIR/$hash.img"
                 if [ -s "$cover" ]; then echo "$cover"; exit 0; fi
                 if [ -f "$cover.fail" ]; then echo "$bkpCover"; exit 0; fi
@@ -70,7 +71,19 @@ case $Control in
                         elif mpc albumart "$file" > "$cover.tmp" 2>/dev/null && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
                             mv "$cover.tmp" "$cover"
                         else
-                            touch "$cover.fail"
+                            # интернет-фоллбек: iTunes Search (без ключа)
+                            q=$(mpc current -f '[[%artist% ]%title%]' | head -c 120)
+                            # радио-сеты: "Show NNN: Artist - Track" — берём часть после ':'
+                            case "$q" in *': '*) q="${q##*: }";; esac
+                            if [ -n "$q" ]; then
+                                aurl=$(curl -sm 6 "https://itunes.apple.com/search?term=$(printf '%s' "$q" | jq -sRr @uri)&media=music&limit=1" \
+                                    | jq -r '.results[0].artworkUrl100 // empty' | sed 's/100x100/600x600/')
+                                if [ -n "$aurl" ] && curl -sm 8 "$aurl" -o "$cover.tmp" \
+                                   && file -b --mime-type "$cover.tmp" | grep -q '^image/'; then
+                                    mv "$cover.tmp" "$cover"
+                                fi
+                            fi
+                            [ -s "$cover" ] || touch "$cover.fail"
                         fi
                         rm -f "$cover.tmp" "$cover.tmp.png"
                         rmdir "$cover.lock" 2>/dev/null
@@ -78,6 +91,37 @@ case $Control in
                     ) &
                 fi
                 echo "$bkpCover"
+                ;;
+            --lyrics)
+                # ash: текст песни с lrclib.net (без ключа), кэш по треку.
+                # Печатает путь к файлу или пусто.
+                title=$(mpc current -f %title%)
+                artist=$(mpc current -f %artist%)
+                [ -z "$title" ] && exit 0
+                case "$title" in *': '*)
+                    rest="${title##*: }"
+                    case "$rest" in *' - '*)
+                        artist="${rest%% - *}"; title="${rest#* - }";;
+                    esac
+                esac
+                LDIR="$HOME/.cache/mpd-lyrics"; mkdir -p "$LDIR"
+                lhash=$(printf '%s|%s' "$artist" "$title" | md5sum | cut -d' ' -f1)
+                lyr="$LDIR/$lhash.txt"
+                if [ -s "$lyr" ]; then echo "$lyr"; exit 0; fi
+                [ -f "$lyr.fail" ] && exit 0
+                enc() { printf '%s' "$1" | jq -sRr @uri; }
+                txt=$(curl -sm 8 "https://lrclib.net/api/get?artist_name=$(enc "$artist")&track_name=$(enc "$title")" \
+                    | jq -r '.plainLyrics // empty' 2>/dev/null)
+                if [ -z "$txt" ]; then
+                    txt=$(curl -sm 8 "https://lrclib.net/api/search?q=$(enc "$artist $title")" \
+                        | jq -r '.[0].plainLyrics // empty' 2>/dev/null)
+                fi
+                if [ -n "$txt" ]; then
+                    printf '%s — %s\n\n%s\n' "$artist" "$title" "$txt" > "$lyr"
+                    echo "$lyr"
+                else
+                    touch "$lyr.fail"
+                fi
                 ;;
             nccover)
                 ffmpeg -i "$mpddir/$(mpc current -f %file%)" "$Cover" -y > /dev/null 2>&1 || cp "$bkpCover" "$Cover"
