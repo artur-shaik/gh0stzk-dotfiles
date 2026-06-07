@@ -7,6 +7,7 @@ EWW="eww -c $HOME/.config/bspwm/eww"
 # только когда секция открыта; тоггл не трогаем
 if [ "$1" = "--refresh" ]; then
     [ "$($EWW get lyrics-open 2>/dev/null)" = "true" ] || exit 0
+    $EWW update lyrics-text="… загрузка …"
     f=$(MediaControl --lyrics)
     if [ -n "$f" ] && [ -s "$f" ]; then
         $EWW update lyrics-text="$(cat "$f")"
@@ -23,9 +24,11 @@ if [ "$($EWW get lyrics-open 2>/dev/null)" = "true" ]; then
     $EWW open music --screen "$(pointer-screen)"
     exit 0
 fi
+# индикация: открыть секцию сразу, текст подъедет
+$EWW update lyrics-text="… загрузка …" lyrics-open=true
 f=$(MediaControl --lyrics)
 if [ -n "$f" ] && [ -s "$f" ]; then
-    $EWW update lyrics-text="$(cat "$f")" lyrics-open=true
+    $EWW update lyrics-text="$(cat "$f")"
 else
-    $EWW update lyrics-text="(текст не найден)" lyrics-open=true
+    $EWW update lyrics-text="(текст не найден)"
 fi
