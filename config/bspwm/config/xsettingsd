@@ -1,6 +1,6 @@
 Net/ThemeName "RosePineMoon-zk"
 Net/IconThemeName "Catppuccin-Mocha"
-Gtk/CursorThemeName "Qogirr-Dark"
+Gtk/CursorThemeName "Future-cursors"
 Gtk/DecorationLayout ":"
 Xft/Hinting 1
 Xft/HintStyle "hintfull"

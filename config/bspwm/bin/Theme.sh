@@ -45,6 +45,7 @@ if [ -r "$HOME/.cache/wal/colors.sh" ]; then
     blueb="$color12"   magentab="$color13" cyanb="$color14"  whiteb="$color15"
     accent_color="$color4"
     arch_icon="$color4"
+    gtk_cursor="Future-cursors"  # ash: реальная установленная тема (Qogirr-Dark нет)
     # rofi_* в theme-config — формулы от $bg/$fg, но вычислены ДО override:
     # пересчитать от wal-палитры (семантика как у райсов)
     rofi_background="$bg"
