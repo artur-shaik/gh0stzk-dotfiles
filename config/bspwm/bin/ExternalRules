@@ -61,6 +61,9 @@ case "$class" in
     Viewnior)
         result "state=floating focus=on center=on"
         ;;
+    nsxiv|Nsxiv|Sxiv)
+        result "state=floating focus=on center=on rectangle=1000x700+0+0"
+        ;;
     TelegramDesktop)
         result "desktop=^4 follow=on"
         ;;
