@@ -11,7 +11,7 @@ draw() {
         icon='󰖯'
         # >1 окна в monocle — мелкий superscript-счётчик
         n=$(bspc query -N -d focused -n .window | wc -l)
-        [ "$n" -gt 1 ] && icon="${icon} ×${n}"
+        [ "$n" -gt 1 ] && icon="${icon}×${n}"
     else
         icon='󰕰'
     fi
