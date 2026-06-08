@@ -9,6 +9,12 @@ draw() {
         icon='󰖲'
     elif [ "$(bspc query -T -d focused 2>/dev/null | jq -r .layout)" = "monocle" ]; then
         icon='󰖯'
+        # >1 окна в monocle — мелкий superscript-счётчик
+        n=$(bspc query -N -d focused -n .window | wc -l)
+        if [ "$n" -gt 1 ]; then
+            sup=$(printf '%s' "$n" | sed 'y/0123456789/⁰¹²³⁴⁵⁶⁷⁸⁹/')
+            icon="${icon}${sup}"
+        fi
     else
         icon='󰕰'
     fi
