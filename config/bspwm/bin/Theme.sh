@@ -65,6 +65,7 @@ if [ -r "$HOME/.cache/wal/colors.sh" ]; then
         "$HOME/.config/bspwm/rices/$RICE/config.ini" \
         "$HOME/.config/bspwm/rices/$RICE/modules.ini" \
         "$HOME/.config/bspwm/rices/$RICE/bar/eww.scss" 2>/dev/null || true
+    "$HOME"/.config/bspwm/bin/apply-gradient.sh 2>/dev/null
 fi
 # ==================== /ash ====================
 
