@@ -80,8 +80,8 @@ run() {
 # Launch sxhkd daemon (ash: наши хоткеи, не gh0stzk)
 run sxhkd -c "${HOME}"/.config/sxhkd/sxhkdrc
 
-# ash: раскладка us,ru как в старом профиле
-setxkbmap -layout 'us,ru' -option 'grp:alt_space_toggle,grp_led:caps,ctrl:nocaps'
+# ash: раскладка us,ru + авто-восстановление при hotplug клавиатуры
+"$HOME"/.config/bspwm/bin/kbd-layout-watch.sh &
 
 # Load current theme
 "${HOME}"/.config/bspwm/bin/Theme.sh
