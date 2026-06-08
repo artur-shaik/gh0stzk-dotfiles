@@ -1,25 +1,24 @@
 #!/bin/sh
-# ash: реакция на hotplug мониторов — пере-раскладка + рестарт баров.
-# Вынесено из bspwmrc, чтобы перезапускать без рестарта bspwm.
+# ash: реакция на hotplug — с ДЕБАУНСОМ. monitor_geometry сыпется пачкой;
+# без дебаунса параллельные MonitorSetup+bar-restart дрались и теряли окна.
+# Окна при отключении мигрирует сам bspwm (remove_unplugged_monitors=true).
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 LOG="$HOME/.cache/bspwm-hotplug.log"
+PIDF=/tmp/.hotplug-debounce.pid
 
-snap() { for d in $(bspc query -D); do
-    printf '%s@%s:%s ' "$(bspc query -D -d "$d" --names)" \
-        "$(bspc query -M -m "$(bspc query -M -d "$d")" --names)" \
-        "$(bspc query -N -d "$d" -n .window | wc -l)"
-done; }
+apply() {
+    sleep 1.2   # переждать пачку событий
+    printf '%s apply | mons=[%s]\n' "$(date +%T)" "$(bspc query -M --names | tr '\n' ',')" >> "$LOG"
+    MonitorSetup
+    "$HOME/.local/bin/bar-restart"
+}
 
 pkill -f 'bspc subscribe monitor' 2>/dev/null
 bspc subscribe monitor | while read -r ev _; do
     case $ev in
         monitor_add|monitor_geometry|monitor_remove)
-            printf '%s %s | BEFORE mons=[%s] desks: %s\n' "$(date +%T)" "$ev" \
-                "$(bspc query -M --names | tr '\n' ',')" "$(snap)" >> "$LOG"
-            MonitorSetup
-            "$HOME/.local/bin/bar-restart"
-            printf '%s %s | AFTER  mons=[%s] desks: %s\n' "$(date +%T)" "$ev" \
-                "$(bspc query -M --names | tr '\n' ',')" "$(snap)" >> "$LOG"
+            [ -f "$PIDF" ] && kill "$(cat "$PIDF")" 2>/dev/null
+            apply & echo $! > "$PIDF"
             ;;
     esac
 done

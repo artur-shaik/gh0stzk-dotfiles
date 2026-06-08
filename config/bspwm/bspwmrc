@@ -45,6 +45,8 @@ pkill -f 'bspc subscribe node_add node_remove' 2>/dev/null
 
 bspc config external_rules_command "${HOME}"/.config/bspwm/bin/ExternalRules
 
+bspc config remove_unplugged_monitors true
+bspc config merge_overlapping_monitors true
 bspc config window_gap                5
 bspc config split_ratio               0.51
 bspc config single_monocle            false  # ash: иначе одиночное окно всегда monocle и layout-gaps не работают

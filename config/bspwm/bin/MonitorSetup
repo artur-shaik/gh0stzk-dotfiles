@@ -23,16 +23,10 @@ xrandr | while read -r mon state _; do
     [ "$state" = "disconnected" ] && xrandr --output "$mon" --off
 done
 
-# ash: фантомные (физически отключённые) мониторы удаляем СРАЗУ через
-# bspc monitor -r — он мигрирует ВСЕ их десктопы целиком (с окнами) на
-# оставшийся монитор, включая последний. Поштучный перенос (node -m или
-# desktop -m в ensure_and_move) НЕ может унести последний десктоп монитора
-# (bspwm требует >=1) — тот десктоп застревал, и Super+0 (^10) терял цель.
-connected=$(echo "$XRANDR_OUTPUT" | awk '$2 == "connected" {print $1}')
-for m in $(bspc query -M --names); do
-    echo "$connected" | grep -qx "$m" && continue
-    bspc monitor "$m" -r 2>/dev/null
-done
+# ash: phantom-логики НЕТ — remove_unplugged_monitors=true (bspwmrc) даёт
+# bspwm САМ мигрировать десктопы отключённого монитора на живой (с окнами,
+# штатно). Наши костыли (monitor -r после xrandr --off + гонка событий)
+# ТЕРЯЛИ окна. MonitorSetup лишь раскладывает столы по текущим мониторам.
 
 # ash: распределение десктопов ПЕРЕНОСОМ — bspc monitor -d (reset) удаляет
 # лишние десктопы вместе с окнами и создаёт пустые на новом мониторе
