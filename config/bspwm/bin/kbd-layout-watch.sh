@@ -1,6 +1,7 @@
 #!/bin/sh
 # ash: переустановка раскладки при hotplug клавиатуры — X сбрасывает
 # layout на дефолт когда USB-клава (Corne) переподключается.
+export DISPLAY="${DISPLAY:-:0}"   # systemd --user может не иметь его
 LAYOUT="setxkbmap -layout us,ru -option grp:alt_space_toggle,grp_led:caps,ctrl:nocaps"
 $LAYOUT
 PIDF=/tmp/.kbd-layout-debounce.pid
