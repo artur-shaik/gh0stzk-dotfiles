@@ -10,6 +10,9 @@ while IFS= read -r line; do
     case "$line" in
         *[0-9]*)
             C=$(col "$1"); BG=$(col bg)
+            # вычистить %{F..} из ввода (gmail сам красит иконку + %{F-} сброс
+            # на дефолт polybar делал число невидимым на пилюле)
+            line=$(printf '%s' "$line" | sed 's/%{F[^}]*}//g')
             printf ' %%{T4}%%{F%s}%%{B%s}%%{T-}%%{B%s}%%{F%s} %s%s %%{F-}%%{B-}%%{T4}%%{F%s}%%{B%s}%%{T-}%%{B-}%%{F-}\n' \
                 "$C" "$BG" "$C" "$BG" "$ICON" "$line" "$BG" "$C"
             ;;
