@@ -1,6 +1,6 @@
 #!/bin/sh
 # ash: title с иконкой по layout/state текущего десктопа/окна.
-# tiled 󰕰 | monocle 󰊓 | floating-окно в фокусе 󰖲. Реактивно (bspc subscribe).
+# tiled 󰕰 | monocle 󰖯 | floating-окно в фокусе 󰖲. Реактивно (bspc subscribe).
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 
 draw() {
@@ -8,7 +8,7 @@ draw() {
     if [ -n "$foc" ] && bspc query -N -n "$foc.floating" >/dev/null 2>&1; then
         icon='󰖲'
     elif [ "$(bspc query -T -d focused 2>/dev/null | jq -r .layout)" = "monocle" ]; then
-        icon='󰊓'
+        icon='󰖯'
     else
         icon='󰕰'
     fi
