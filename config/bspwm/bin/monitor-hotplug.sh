@@ -22,4 +22,4 @@ bspc subscribe monitor | while read -r ev _; do
                 "$(bspc query -M --names | tr '\n' ',')" "$(snap)" >> "$LOG"
             ;;
     esac
-done &
+done

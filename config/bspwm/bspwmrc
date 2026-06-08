@@ -29,7 +29,7 @@ MonitorSetup
 
 # ash: hotplug мониторов — пере-раскладка десктопов и спасение окон
 # (без этого отключённый монитор остаётся фантомом с окнами)
-"$HOME"/.config/bspwm/bin/monitor-hotplug.sh
+"$HOME"/.config/bspwm/bin/monitor-hotplug.sh &
 
 # ash: вертикальные гапы по layout (tiled: 20px, monocle: впритык)
 pkill -f 'layout-gaps.sh' 2>/dev/null
