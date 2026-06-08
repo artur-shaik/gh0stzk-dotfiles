@@ -87,7 +87,7 @@ while :; do
             # а просрочка должна ОРАТЬ независимо от обоев
             pill "#d54e53" "$icon +$(mmss "$over")"
         else
-            pill purple "$icon $(mmss "$left")"
+            pill fg "$icon $(mmss "$left")"
         fi
     fi
     sleep 1
