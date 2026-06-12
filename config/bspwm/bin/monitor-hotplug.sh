@@ -8,7 +8,18 @@ PIDF=/tmp/.hotplug-debounce.pid
 
 apply() {
     sleep 1.2   # переждать пачку событий
-    printf '%s apply | mons=[%s]\n' "$(date +%T)" "$(bspc query -M --names | tr '\n' ',')" >> "$LOG"
+    # ГАРД (2026-06-11): транзиентный DPMS/лок (смена темы под xsecurelock)
+    # может дать 0 connected / 0 мониторов. Тогда MonitorSetup'овский цикл
+    # `xrandr --output <disconnected> --off` гасит ВСЕ выходы -> bspwm в ноль
+    # мониторов -> сессия коллапсирует, X выходит (падал именно так).
+    # На вырожденном состоянии — пропустить; bspwm восстановит при пробуждении.
+    conn=$(xrandr 2>/dev/null | grep -c ' connected')
+    mons=$(bspc query -M --names 2>/dev/null | grep -c .)
+    printf '%s apply | conn=%s mons=%s\n' "$(date +%T)" "$conn" "$mons" >> "$LOG"
+    if [ "${conn:-0}" -eq 0 ] || [ "${mons:-0}" -eq 0 ]; then
+        printf '%s SKIP transient (DPMS/lock, xrandr не трогаем)\n' "$(date +%T)" >> "$LOG"
+        return
+    fi
     MonitorSetup
     "$HOME/.local/bin/bar-restart"
 }

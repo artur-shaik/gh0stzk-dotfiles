@@ -31,6 +31,10 @@ MonitorSetup
 # (без этого отключённый монитор остаётся фантомом с окнами)
 "$HOME"/.config/bspwm/bin/monitor-hotplug.sh &
 
+# ash: ВРЕМЕННО — логгер для отлова спонтанного краша X при смене темы.
+# Логи ~/theme-debug/latest/. Снять после диагностики (этот блок + theme-step-вызовы).
+"$HOME"/.local/bin/theme-crash-logger &
+
 # ash: вертикальные гапы по layout (tiled: 20px, monocle: впритык)
 pkill -f 'layout-gaps.sh' 2>/dev/null
 "$HOME"/.config/bspwm/bin/layout-gaps.sh &

@@ -18,6 +18,13 @@
 # xrandr cmd
 XRANDR_OUTPUT=$(xrandr)
 
+# ГАРД (2026-06-11): 0 подключённых выходов = транзиент DPMS/лока. Иначе цикл
+# ниже погасит всё `--output --off` -> bspwm в ноль мониторов -> X-сессия в ноль.
+if [ "$(printf '%s\n' "$XRANDR_OUTPUT" | grep -c ' connected')" -eq 0 ]; then
+    echo "MonitorSetup: 0 connected outputs (transient DPMS/lock) — abort"
+    exit 0
+fi
+
 # Remove disconnected monmitors
 xrandr | while read -r mon state _; do
     [ "$state" = "disconnected" ] && xrandr --output "$mon" --off

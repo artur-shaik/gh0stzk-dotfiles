@@ -3,6 +3,14 @@
 # Хост выбирает обёртка bspwm/bin/mpc (активный: remote или localhost).
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 
+# Антимерцание: remote-mpd блипает (коннект-фейл -> mpc rc!=0, ИЛИ обёртка
+# фоллбечит на idle-localhost -> rc=0 но пусто). Любое "нет данных" не прячем
+# сразу — держим последнюю плашку GRACE секунд (кэш). Реальный stop тоже
+# повисит GRACE сек и исчезнет — приемлемо, блипы ~2с укладываются.
+CACHE=/tmp/.mpd-pill-last
+TS=/tmp/.mpd-pill-ts
+GRACE=8
+
 # mpc-скобки прячутся, только если ВСЕ теги внутри пусты:
 # [[%artist% - ]%title%] -> внутренняя скобка изолирует артиста:
 # оба тега -> "artist - title"; только title -> "title"; пусто -> fallback ниже
@@ -20,7 +28,18 @@ cur=$(mpc current -f '[[%artist% - ]%title%]' 2>/dev/null | cut -c1-$limit)
 if [ -z "$cur" ]; then
     cur=$(mpc current -f '%file%' 2>/dev/null | sed 's|.*/||; s|\.[a-zA-Z0-9]*$||' | cut -c1-$limit)
 fi
-[ -z "$cur" ] && exit 0
+
+# нет данных (блип/стоп): в пределах grace — отдать последнюю плашку
+if [ -z "$cur" ]; then
+    last=$(cat "$TS" 2>/dev/null)
+    now=$(date +%s)
+    if [ -n "$last" ] && [ $(( now - ${last:-0} )) -lt "$GRACE" ]; then
+        cat "$CACHE" 2>/dev/null
+    else
+        : > "$CACHE"   # grace вышел -> прячем (pill-wrap на пустой строке)
+    fi
+    exit 0
+fi
 
 state=$(mpc status 2>/dev/null | sed -n '2s/^\[\([a-z]*\)\].*/\1/p')
 if [ "$state" = "playing" ]; then
@@ -28,4 +47,8 @@ if [ "$state" = "playing" ]; then
 else
     icon="󰏤"
 fi
-printf '%s %s\n' "$icon" "$cur"
+
+line=$(printf '%s %s' "$icon" "$cur")
+printf '%s\n' "$line"
+printf '%s\n' "$line" > "$CACHE"
+date +%s > "$TS"
