@@ -84,6 +84,25 @@ run() {
 # Launch sxhkd daemon (ash: наши хоткеи, не gh0stzk)
 run sxhkd -c "${HOME}"/.config/sxhkd/sxhkdrc
 
+# ash: блокировка экрана (xss-lock+xsecurelock). РАНЬШЕ была в .xinitrc, но
+# gdm-autologin запускает сессию `bspwm` НАПРЯМУЮ (Exec=bspwm, .dmrc Session=bspwm)
+# и .xinitrc НЕ читает → lock не стартовал после апдейта. `xset s` = idle-таймер
+# для xss-lock. pgrep-гард — bspwmrc гоняется и на reload (без дублей).
+xset s 300 5
+pgrep -x xss-lock >/dev/null || \
+    xss-lock -n /usr/local/libexec/xsecurelock/dimmer -l -- \
+    env XSECURELOCK_SAVER="${HOME}"/bin/xsecurelock-saver-time XSECURELOCK_NO_COMPOSITE=1 xsecurelock &
+
+# ash: демоны что РАНЬШЕ были в .xinitrc (gdm-сессия его НЕ читает — см. выше).
+# nextcloud/kdeconnectd идут через XDG-autostart, тут НЕ дублировать. mpd — удалённый.
+# run() = pidof-гард, без дублей на reload.
+# udiskie=python-скрипт, indicator=comm обрезан 15симв → pidof/run() их НЕ ловит
+# (плодил бы дубли на reload) → гард через pgrep -f по строке команды.
+pgrep -f '\budiskie\b'             >/dev/null || udiskie -n -T &
+pgrep -f '\bkdeconnect-indicator\b' >/dev/null || kdeconnect-indicator &
+run kbdd
+run barrier
+
 # ash: раскладка us,ru (hotplug-восстановление — user-сервис kbd-layout.service)
 setxkbmap -layout 'us,ru' -option 'grp:alt_space_toggle,grp_led:caps,ctrl:nocaps'
 systemctl --user start kbd-layout.service 2>/dev/null
