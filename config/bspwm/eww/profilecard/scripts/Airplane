@@ -13,19 +13,22 @@ mkdir -p "$cache_dir"
 [ -f "$cache_file" ] || echo "Off" > "$cache_file"
 
 # Function to check if the system has Bluetooth and if the service is active
+# ash: rfkill убран (не установлен в системе).
 has_bluetooth() {
-    if ! rfkill list bluetooth >/dev/null 2>&1; then
-        return 1
-    fi
-
-    if systemctl is-active bluetooth >/dev/null 2>&1; then
-        return 0
-    else
-        return 1
-    fi
+    command -v bluetoothctl >/dev/null 2>&1 || return 1
+    systemctl is-active bluetooth >/dev/null 2>&1 || return 1
+    bluetoothctl show 2>/dev/null | grep -q "Controller" || return 1
+    return 0
 }
 
 get_state() {
+    # ash: правда от nmcli, не залипший cache (был ложный "On" при enabled-сети).
+    # networking enabled → точно НЕ airplane → синхронизируем cache в Off.
+    if nmcli networking 2>/dev/null | grep -q "enabled"; then
+        echo "Off" > "$cache_file"
+        echo "Off"
+        return
+    fi
     head -n 1 "$cache_file" 2>/dev/null || echo "Off"
 }
 
