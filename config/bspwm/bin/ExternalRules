@@ -66,10 +66,10 @@ case "$class" in
         result "state=floating focus=on center=on rectangle=1000x700+0+0"
         ;;
     TelegramDesktop)
-        result "desktop=4 follow=on"
+        result "desktop=^4 follow=on"
         ;;
     qutebrowser)
-        result "desktop=6 follow=on"
+        result "desktop=^6 follow=on"
         ;;
     pavucontrol)
         result "state=floating center=on"
@@ -78,7 +78,7 @@ case "$class" in
         result "desktop=^2 follow=on"
         ;;
     firefox|Navigator)
-        result "desktop=9 follow=on"
+        result "desktop=^9 follow=on"
         ;;
 esac
 

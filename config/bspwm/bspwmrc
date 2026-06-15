@@ -43,6 +43,11 @@ pkill -f 'layout-gaps.sh' 2>/dev/null
 pkill -f 'bspc subscribe node_add node_remove' 2>/dev/null
 "$HOME"/.config/bspwm/bin/window-blackbox &
 
+# ash: до-расстановка окон с поздним WM_CLASS (qutebrowser и пр.) — external_rules
+# при маппинге видит пустой class и промахивается. Подписчик чинит на node_add.
+pkill -f 'late-desktop-rules.sh' 2>/dev/null
+"$HOME"/.config/bspwm/bin/late-desktop-rules.sh &
+
 #  ╔╗ ╔═╗╔═╗╦ ╦╔╦╗  ╔═╗╔═╗╔╗╔╔═╗╦╔═╗
 #  ╠╩╗╚═╗╠═╝║║║║║║  ║  ║ ║║║║╠╣ ║║ ╦
 #  ╚═╝╚═╝╩  ╚╩╝╩ ╩  ╚═╝╚═╝╝╚╝╚  ╩╚═╝
