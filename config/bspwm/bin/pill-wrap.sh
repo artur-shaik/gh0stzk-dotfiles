@@ -7,7 +7,13 @@ RICE=$(cat "$HOME/.config/bspwm/.rice" 2>/dev/null)
 CFG="$HOME/.config/bspwm/rices/$RICE/config.ini"
 col() { awk -v k="$1" '$1==k && $2=="=" {print $3; exit}' "$CFG"; }
 
-C=$(col "$1"); BG=$(col bg)
+# ash: $1 = имя роли из [color] ИЛИ прямой #hex (для семантичных цветов вроде
+# алого алерта угрозы, что не должен зависеть от wal-палитры).
+case "$1" in
+    \#*) C="$1" ;;
+    *)   C=$(col "$1") ;;
+esac
+BG=$(col bg)
 ICON=$2; RE=$3
 shift 3
 
