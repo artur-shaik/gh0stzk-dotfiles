@@ -28,12 +28,20 @@ read -r RICE < "$HOME"/.config/bspwm/.rice
 # ====================================================================
 export PATH="$HOME/.config/bspwm/bin:$PATH"
 
-if [ -r "$HOME/.cache/wal/wal" ]; then
+# ash: источник правды об обоях — current_wall (пишем его МЫ, и ровно его ставит feh).
+# ~/.cache/wal/wal — кэш pywal: пишется при ЛЮБОМ `wal -i` ещё ДО генерации палитры
+# (image.py «Cache the image file path»), поэтому после упавшей/крашнувшей смены темы
+# там лежат обои, которых на экране нет. Плюс с `wal -n` (см. фикс краша X) wal обои
+# вообще не ставит — связь его кэша с экраном порвана. Fallback на wal-кэш — только
+# если current_wall пуст/пропал.
+CUR_WALL=""
+[ -r "$HOME/.cache/wal/current_wall" ] && read -r CUR_WALL < "$HOME/.cache/wal/current_wall"
+if [ ! -f "$CUR_WALL" ] && [ -r "$HOME/.cache/wal/wal" ]; then
     read -r CUR_WALL < "$HOME/.cache/wal/wal"
-    if [ -f "$CUR_WALL" ]; then
-        ENGINE="Default"
-        DEFAULT_WALL="$CUR_WALL"
-    fi
+fi
+if [ -f "$CUR_WALL" ]; then
+    ENGINE="Default"
+    DEFAULT_WALL="$CUR_WALL"
 fi
 
 if [ -r "$HOME/.cache/wal/colors.sh" ]; then
