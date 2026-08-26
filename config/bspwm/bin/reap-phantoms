@@ -1,0 +1,45 @@
+#!/usr/bin/env -S uv run --quiet --script
+# /// script
+# requires-python = ">=3.9"
+# dependencies = ["python-xlib"]
+# ///
+# ash: снять bspwm-фантомы — клиент-ноды на окна, которых в X уже нет.
+# Причина: приложение сдохло молча, bspwm пропустил DestroyNotify → нода
+# висит tiled/невидимо и ест слот в тайлинге (см. Workrave-случай).
+# Чиним синтетическим DestroyNotify на рут (bspwm слушает SubstructureNotify).
+# -k/-c/wmctrl не берут — все шлют X-сообщение мёртвому окну → BadWindow.
+import subprocess, sys
+from Xlib import X, display, error
+
+def bspc_windows():
+    out = subprocess.run(["bspc", "query", "-N", "-n", ".window"],
+                         capture_output=True, text=True).stdout
+    ids = []
+    for line in out.split():
+        try:
+            ids.append(int(line, 16))
+        except ValueError:
+            pass
+    return ids
+
+d = display.Display()
+root = d.screen().root
+phantoms = []
+for wid in bspc_windows():
+    w = d.create_resource_object("window", wid)
+    try:
+        w.get_attributes()          # живое окно вернёт атрибуты
+    except error.BadWindow:
+        phantoms.append((wid, w))   # X не знает окно → bspwm-фантом
+
+for wid, w in phantoms:
+    ev = __import__("Xlib.protocol.event", fromlist=["DestroyNotify"]).DestroyNotify(
+        event=root, window=w)
+    root.send_event(ev, event_mask=X.SubstructureNotifyMask)
+d.sync()
+
+n = len(phantoms)
+msg = "Фантомов нет" if n == 0 else f"Снято фантомов: {n}"
+subprocess.run(["notify-send", "-u", "low", "-t", "2500", "bspwm reap", msg])
+print(msg)
+sys.exit(0)
