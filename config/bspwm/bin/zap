@@ -1,0 +1,25 @@
+#!/bin/sh
+# ash: прицел-клик по любому окну -> спрятать (дефолт) или убить (-k).
+# Для застрявших override_redirect/Withdrawn окон (трей-попапы Qt/GTK, напр.
+# nextcloud), которые bspwm НЕ держит в дереве -> bspc/оконные хоткеи мимо.
+# Работаем напрямую по X через xdotool, а не через WM.
+#   zap      клик -> windowunmap (спрятать, процесс жив; обратимо re-map'ом)
+#   zap -k   клик -> windowkill  (XKillClient — рвёт клиента, МОЖЕТ убить всё
+#            приложение, если окно делит соединение, напр. попап трея)
+export DISPLAY="${DISPLAY:-:0}"
+mode=hide
+[ "$1" = "-k" ] && mode=kill
+
+wid=$(xdotool selectwindow 2>/dev/null) || { notify-send -u low "zap" "отменено"; exit 1; }
+hx=$(printf '0x%x' "$wid")
+cls=$(xprop -id "$wid" WM_CLASS 2>/dev/null | sed 's/.*= //')
+pid=$(xprop -id "$wid" _NET_WM_PID 2>/dev/null | grep -o '[0-9]*')
+
+if [ "$mode" = kill ]; then
+    xdotool windowkill "$wid" 2>/dev/null
+    notify-send -u normal -t 3000 "zap: killed" "$hx $cls${pid:+  (pid $pid)}"
+else
+    xdotool windowunmap "$wid" 2>/dev/null
+    notify-send -u low -t 3500 "zap: hidden" "$hx $cls${pid:+
+add: если завис насовсем — kill $pid}"
+fi
