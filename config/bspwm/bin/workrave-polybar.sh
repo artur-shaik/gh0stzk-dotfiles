@@ -29,16 +29,20 @@ if [ "$1" = "break" ]; then
     exit 0
 fi
 
+# главное окно workrave (не break-окна): класс workrave.Workrave + заголовок ровно Workrave
+main_win() { wmctrl -lx 2>/dev/null | awk '$3=="workrave.Workrave" && $NF=="Workrave"{print $1; exit}'; }
+SHOW_FLAG="${XDG_RUNTIME_DIR:-/tmp}/workrave-pill-show"
+
 if [ "$1" = "open" ]; then
+    # показать главное окно по требованию: ставим флаг, watcher 8с его не прячет
+    touch "$SHOW_FLAG"
     busctl --user call "$WR_DEST" /org/workrave/Workrave/UI \
         org.workrave.ControlInterface OpenMain 2>/dev/null
     sleep 0.3
-    # xdotool search не годится: видит 4 workrave-окна (трей/брейк, unmapped);
-    # wmctrl лижет только managed-окна
-    wid=$(wmctrl -lx 2>/dev/null | awk '/workrave\.Workrave/{print $1; exit}')
+    wid=$(main_win)
     [ -n "$wid" ] || exit 0
-    bspc node "$wid" -d focused 2>/dev/null
-    bspc node "$wid" -f
+    bspc node "$wid" -g hidden=off -g sticky=off
+    bspc node "$wid" -d focused -f
     exit 0
 fi
 
@@ -54,6 +58,22 @@ pill() { # <color-name | #hex> <text>
 }
 
 mmss() { s=$1; [ "$s" -lt 0 ] && s=0; printf '%d:%02d' $((s / 60)) $((s % 60)); }
+
+# сторож главного окна: в системе нет systray (polybar tray XEmbed-host не поднимает),
+# workrave с trayicon-enabled=true форсит главное окно и возвращает его при закрытии.
+# Прячем его (bspwm hidden), доступ — через пилюлю; СКМ (open) показывает на 8с по флагу.
+tame_main() {
+    wid=$(main_win)
+    [ -n "$wid" ] || return
+    # пользователь только что нажал open — не мешаем 8с
+    if [ -f "$SHOW_FLAG" ] && [ $(( $(date +%s) - $(stat -c %Y "$SHOW_FLAG" 2>/dev/null || echo 0) )) -lt 8 ]; then
+        return
+    fi
+    bspc node "$wid" -g sticky=off 2>/dev/null
+    case "$(bspc query -T -n "$wid" 2>/dev/null)" in
+        *'"hidden":false'*) bspc node "$wid" -g hidden=on 2>/dev/null ;;
+    esac
+}
 
 # длительности перерывов/лимит работы из конфига workrave (меняются редко — читаем раз)
 REST_LEN=$(busctl --user call "$WR_DEST" "$WR_CORE" org.workrave.ConfigInterface \
@@ -90,5 +110,6 @@ while :; do
             pill grad4 "$icon $(mmss "$left")"
         fi
     fi
+    tame_main
     sleep 1
 done
