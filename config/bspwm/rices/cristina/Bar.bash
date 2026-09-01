@@ -12,6 +12,10 @@ _monlist() { polybar --list-monitors | cut -d":" -f1; }
 TRAY_MON=$(_monlist | grep -m1 '^eDP')
 [ -z "$TRAY_MON" ] && TRAY_MON=$(_monlist | head -n1)
 
+# есть ли батарея (десктоп/ноут без неё -> прячем всю battery-пилюлю с колпачками)
+HAS_BAT=0
+for _b in /sys/class/power_supply/BAT*; do [ -e "$_b" ] && HAS_BAT=1 && break; done
+
 # right module sets (без tray-группы и хвоста power — добавляются ниже).
 # left/center unchanged across modes.
 RIGHT_FULL="vdict mpd2 tasks gmail workrave loadavg docker memalert secscanalert secscanscan sep g3i network g3d sep g3i ping g3d updates2 keyboard sep g2i pulseaudio g2d sep g2i battery g2d bluetooth2 sep g2i usercard g2d sep g1i date g1d"
@@ -25,6 +29,9 @@ _launch_bar() {
     pidf="$HOME/.cache/polybar-$mon.pid"
     mode=$(cat "$HOME/.cache/polybar-mode-$mon" 2>/dev/null || echo full)
     [ "$mode" = min ] && right="$RIGHT_MIN" || right="$RIGHT_FULL"
+    # нет батареи — вырезать battery-пилюлю целиком (колпачки + модуль),
+    # схлопнуть осевший двойной sep
+    [ "$HAS_BAT" = 0 ] && right=$(printf '%s' "$right" | sed -e 's/ *g2i battery g2d//' -e 's/sep  *sep/sep/g')
     if [ "$mon" = "$TRAY_MON" ]; then
         right="$right $TRAY_GROUP sep power"            # tray-монитор: с треем
     else
