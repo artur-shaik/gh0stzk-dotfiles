@@ -31,7 +31,7 @@ _launch_bar() {
     [ "$mode" = min ] && right="$RIGHT_MIN" || right="$RIGHT_FULL"
     # нет батареи — вырезать battery-пилюлю целиком (колпачки + модуль),
     # схлопнуть осевший двойной sep
-    [ "$HAS_BAT" = 0 ] && right=$(printf '%s' "$right" | sed -e 's/ *g2i battery g2d//' -e 's/sep  *sep/sep/g')
+    [ "$HAS_BAT" = 0 ] && right=$(printf '%s' "$right" | sed -e 's/sep g2i battery g2d//' -e 's/  */ /g' -e 's/sep sep/sep/g' -e 's/^ *//;s/ *$//')
     if [ "$mon" = "$TRAY_MON" ]; then
         right="$right $TRAY_GROUP sep power"            # tray-монитор: с треем
     else
