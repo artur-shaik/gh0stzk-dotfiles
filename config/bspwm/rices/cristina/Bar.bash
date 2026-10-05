@@ -18,8 +18,8 @@ for _b in /sys/class/power_supply/BAT*; do [ -e "$_b" ] && HAS_BAT=1 && break; d
 
 # right module sets (без tray-группы и хвоста power — добавляются ниже).
 # left/center unchanged across modes.
-RIGHT_FULL="vdict mpd2 tasks gmail workrave loadavg docker memalert secscanalert secscanscan sep g3i network g3d sep g3i ping g3d updates2 keyboard sep g2i pulseaudio g2d sep g2i battery g2d bluetooth2 sep g2i usercard g2d sep g1i date g1d"
-RIGHT_MIN="vdict mpd2 memalert secscanalert secscanscan sep g3i network g3d keyboard sep g2i pulseaudio g2d sep g2i battery g2d sep g1i date g1d"
+RIGHT_FULL="vdict kblayer mpd2 tasks tactive gmail workrave loadavg docker memalert secscanalert secscanscan sep g3i network g3d sep g3i ping g3d updates2 keyboard sep g2i pulseaudio g2d sep g2i battery g2d bluetooth2 sep g2i usercard g2d sep g1i date g1d"
+RIGHT_MIN="vdict kblayer mpd2 memalert secscanalert secscanscan sep g3i network g3d keyboard sep g2i pulseaudio g2d sep g2i battery g2d sep g1i date g1d"
 # systray — на одном мониторе (TRAY_MON: eDP или первый). Иначе бары дерутся
 # за _NET_SYSTEM_TRAY (гонка, иконки на случайном). traytoggle тоже только там.
 TRAY_GROUP="sep ahi tray ahd traytoggle"
